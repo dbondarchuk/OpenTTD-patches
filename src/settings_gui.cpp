@@ -1789,6 +1789,7 @@ static SettingsContainer &GetSettingsTree()
 				physics->Add(new SettingEntry("vehicle.train_acceleration_model"));
 				physics->Add(new SettingEntry("vehicle.train_slope_steepness"));
 				physics->Add(new SettingEntry("vehicle.wagon_speed_limits"));
+				physics->Add(new SettingEntry("vehicle.max_locomotive_speed_limits"));
 				physics->Add(new SettingEntry("vehicle.freight_trains"));
 				physics->Add(new SettingEntry("vehicle.roadveh_acceleration_model"));
 				physics->Add(new SettingEntry("vehicle.roadveh_slope_steepness"));

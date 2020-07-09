@@ -46,17 +46,6 @@ static bool RenameSign(SignID index, const char* text)
 	return remove;
 }
 
-/**
- * Close the sign window associated with the given sign.
- * @param sign The sign to close the window for.
- */
-void DeleteRenameSignWindow(SignID sign)
-{
-	SignWindow* w = dynamic_cast<SignWindow*>(FindWindowById(WC_QUERY_STRING, WN_QUERY_STRING_SIGN));
-
-	if (w != nullptr && w->cur_sign == sign) delete w;
-}
-
 struct SignList {
 	/**
 	 * A GUIList contains signs and uses a StringFilter for filtering.
@@ -152,7 +141,6 @@ struct SignList {
 	{
 		for (const Sign* si : this->signs) {
 			RenameSign(si->index, "");
-			DeleteRenameSignWindow(si->index);
 		}
 	}
 };
@@ -592,4 +580,15 @@ void ShowRenameSignWindow(const Sign *si)
 	DeleteWindowByClass(WC_QUERY_STRING);
 
 	new SignWindow(&_query_sign_edit_desc, si);
+}
+
+/**
+ * Close the sign window associated with the given sign.
+ * @param sign The sign to close the window for.
+ */
+void DeleteRenameSignWindow(SignID sign)
+{
+	SignWindow *w = dynamic_cast<SignWindow *>(FindWindowById(WC_QUERY_STRING, WN_QUERY_STRING_SIGN));
+
+	if (w != nullptr && w->cur_sign == sign) delete w;
 }
