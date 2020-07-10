@@ -240,6 +240,9 @@ CommandProc CmdSetTimetableStart;
 
 CommandProc CmdOpenCloseAirport;
 
+CommandProc CmdBuildTrafficLights;
+CommandProc CmdRemoveTrafficLights;
+
 CommandProc CmdProgramSignalTraceRestrict;
 CommandProc CmdCreateTraceRestrictSlot;
 CommandProc CmdAlterTraceRestrictSlot;
@@ -464,6 +467,8 @@ static const Command _command_proc_table[] = {
 	DEF_CMD(CmdSetTimetableStart,                              0, CMDT_ROUTE_MANAGEMENT      ), // CMD_SET_TIMETABLE_START
 
 	DEF_CMD(CmdOpenCloseAirport,                               0, CMDT_ROUTE_MANAGEMENT      ), // CMD_OPEN_CLOSE_AIRPORT
+	DEF_CMD(CmdBuildTrafficLights,                             0, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_BUILD_TRAFFICLIGHTS
+	DEF_CMD(CmdRemoveTrafficLights,                            0, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_REMOVE_TRAFFICLIGHTS
 
 	DEF_CMD(CmdProgramSignalTraceRestrict,                     0, CMDT_OTHER_MANAGEMENT      ), // CMD_PROGRAM_TRACERESTRICT_SIGNAL
 	DEF_CMD(CmdCreateTraceRestrictSlot,                        0, CMDT_OTHER_MANAGEMENT      ), // CMD_CREATE_TRACERESTRICT_SLOT

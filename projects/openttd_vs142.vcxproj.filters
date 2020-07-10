@@ -3363,9 +3363,15 @@
     <ClInclude Include="..\src\3rdparty\cpp-btree\safe_btree_set.h">
       <Filter>Btree containers</Filter>
     </ClInclude>
+    <ClCompile Include="..\src\trafficlight.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\media\openttd.ico" />
     <None Include="..\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\trafficlight.h" />
+    <ClInclude Include="..\src\trafficlight_func.h" />
+    <ClInclude Include="..\src\trafficlight_type.h" />
   </ItemGroup>
 </Project>

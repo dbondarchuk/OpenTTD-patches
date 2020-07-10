@@ -105,6 +105,7 @@ tgp.cpp
 tile_map.cpp
 tilearea.cpp
 townname.cpp
+trafficlight.cpp
 #if WIN32
 #else
 	#if OS2
@@ -409,6 +410,9 @@ townname_func.h
 townname_type.h
 track_func.h
 track_type.h
+trafficlight.h
+trafficlight_func.h
+trafficlight_type.h
 train.h
 transparency.h
 transparency_gui.h

@@ -67,6 +67,8 @@
 #include "debug.h"
 #include "zoning.h"
 
+#include "trafficlight_func.h"
+
 #include "void_map.h"
 #include "station_base.h"
 #include "infrastructure_func.h"
@@ -1342,6 +1344,21 @@ static size_t ConvertLandscape(const char *value)
 {
 	/* try with the old values */
 	return LookupOneOfMany("normal|hilly|desert|candy", value);
+}
+
+/**
+ * What to do when traffic light Setting was changed.
+ * @param p1 unused
+ * @return always 0
+ */
+static bool TLSettingChanged(int32 p1)
+{
+	/* Road building gui changed. */
+	MarkWholeScreenDirty();
+
+	/* If traffic lights got disabled, clear them all. */
+	if (!_settings_game.construction.traffic_lights) ClearAllTrafficLights();
+	return true;
 }
 
 static bool CheckFreeformEdges(int32 p1)

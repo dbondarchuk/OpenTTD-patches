@@ -37,6 +37,7 @@
 #include "genworld.h"
 #include "company_gui.h"
 #include "road_func.h"
+#include "trafficlight_func.h"
 
 #include "table/strings.h"
 #include "table/roadtypes.h"
@@ -345,9 +346,10 @@ CommandCost CheckAllowRemoveRoad(TileIndex tile, RoadBits remove, Owner owner, R
  * @param pieces roadbits to remove
  * @param rt roadtype to remove
  * @param crossing_check should we check if there is a tram track when we are removing road from crossing?
+ * @param trafficlights_check Should we check if there is a traffic light before removing road bits?
  * @param town_check should we check if the town allows removal?
  */
-static CommandCost RemoveRoad(TileIndex tile, DoCommandFlag flags, RoadBits pieces, RoadTramType rtt, bool crossing_check, bool town_check = true)
+static CommandCost RemoveRoad(TileIndex tile, DoCommandFlag flags, RoadBits pieces, RoadTramType rtt, bool crossing_check, bool trafficlights_check, bool town_check = true)
 {
 	assert(pieces != ROAD_NONE);
 
@@ -512,6 +514,11 @@ static CommandCost RemoveRoad(TileIndex tile, DoCommandFlag flags, RoadBits piec
 
 			/* Now set present what it will be after the remove */
 			present ^= pieces;
+
+			/* Check if traffic lights are present and if removing them would cause the tile to have less than three roadbits (of any kind!). */
+			if (trafficlights_check && HasTrafficLights(tile) && (CountBits(present | other) < 3)) {
+				return_cmd_error(STR_ERROR_MUST_REMOVE_TRAFFIC_LIGHTS_FIRST);
+			}
 
 			/* Check for invalid RoadBit combinations on slopes */
 			if (tileh != SLOPE_FLAT && present != ROAD_NONE &&
@@ -1313,7 +1320,7 @@ CommandCost CmdRemoveLongRoad(TileIndex start_tile, DoCommandFlag flags, uint32 
 		/* try to remove the halves. */
 		if (bits != 0) {
 			RoadTramType rtt = GetRoadTramType(rt);
-			CommandCost ret = RemoveRoad(tile, flags & ~DC_EXEC, bits, rtt, true);
+			CommandCost ret = RemoveRoad(tile, flags & ~DC_EXEC, bits, rtt, true, true);
 			if (ret.Succeeded()) {
 				if (flags & DC_EXEC) {
 					money -= ret.GetCost();
@@ -1321,7 +1328,7 @@ CommandCost CmdRemoveLongRoad(TileIndex start_tile, DoCommandFlag flags, uint32 
 						_additional_cash_required = DoCommand(start_tile, end_tile, p2, flags & ~DC_EXEC, CMD_REMOVE_LONG_ROAD).GetCost();
 						return cost;
 					}
-					RemoveRoad(tile, flags, bits, rtt, true, false);
+					RemoveRoad(tile, flags, bits, rtt, true, true, false);
 				}
 				cost.AddCost(ret);
 				had_success = true;
@@ -1431,10 +1438,18 @@ static CommandCost ClearTile_Road(TileIndex tile, DoCommandFlag flags)
 			/* Clear the road if only one piece is on the tile OR we are not using the DC_AUTO flag */
 			if ((HasExactlyOneBit(b) && GetRoadBits(tile, RTT_TRAM) == ROAD_NONE) || !(flags & DC_AUTO)) {
 				CommandCost ret(EXPENSES_CONSTRUCTION);
+
+				/* Remove traffic light if necessary. */
+				if (HasTrafficLights(tile)) {
+					CommandCost tl_ret = CmdRemoveTrafficLights(tile, flags, 0, 0, 0);
+					if (tl_ret.Failed()) return tl_ret;
+					ret.AddCost(tl_ret);
+				}
+
 				FOR_ALL_ROADTRAMTYPES(rtt) {
 					if (!MayHaveRoad(tile) || GetRoadType(tile, rtt) == INVALID_ROADTYPE) continue;
 
-					CommandCost tmp_ret = RemoveRoad(tile, flags, GetRoadBits(tile, rtt), rtt, true);
+					CommandCost tmp_ret = RemoveRoad(tile, flags, GetRoadBits(tile, rtt), rtt, true, false);
 					if (tmp_ret.Failed()) return tmp_ret;
 					ret.AddCost(tmp_ret);
 				}
@@ -1453,7 +1468,7 @@ static CommandCost ClearTile_Road(TileIndex tile, DoCommandFlag flags)
 			for (RoadTramType rtt : { RTT_TRAM, RTT_ROAD }) {
 				if (!MayHaveRoad(tile) || GetRoadType(tile, rtt) == INVALID_ROADTYPE) continue;
 
-				CommandCost tmp_ret = RemoveRoad(tile, flags, GetCrossingRoadBits(tile), rtt, false);
+				CommandCost tmp_ret = RemoveRoad(tile, flags, GetCrossingRoadBits(tile), rtt, false, false);
 				if (tmp_ret.Failed()) return tmp_ret;
 				ret.AddCost(tmp_ret);
 			}
@@ -1672,7 +1687,7 @@ void DrawRoadCatenary(const TileInfo *ti)
  * @param dy  the offset from the top of the BB of the tile
  * @param h   the height of the sprite to draw
  */
-static void DrawRoadDetail(SpriteID img, const TileInfo *ti, int dx, int dy, int h)
+void DrawRoadDetail(SpriteID img, const TileInfo *ti, int dx, int dy, int h)
 {
 	int x = ti->x | dx;
 	int y = ti->y | dy;
@@ -1811,6 +1826,8 @@ void DrawRoadBits(TileInfo *ti)
 		DrawGroundSprite((road | tram) & ROAD_X ? SPR_EXCAVATION_X : SPR_EXCAVATION_Y, PAL_NONE);
 		return;
 	}
+
+	if (_settings_game.construction.traffic_lights && HasTrafficLights(ti->tile) && _cur_dpi->zoom <= ZOOM_LVL_DETAIL) DrawTrafficLights(ti);
 
 	/* Draw road, tram catenary */
 	DrawRoadCatenary(ti);
@@ -2060,6 +2077,19 @@ static Foundation GetFoundation_Road(TileIndex tile, Slope tileh)
 	}
 }
 
+/**
+ * Animates the traffic lights on a tile.
+ * @param tile This tile.
+ * @pre The setting must be anabled.
+ * @pre The tile must have trafficlights.
+ */
+void AnimateTile_Road(TileIndex tile)
+{
+	if (_settings_game.construction.traffic_lights && HasTrafficLights(tile)) {
+		if (_tick_counter % 16 == 0) MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
+	}
+}
+
 static const Roadside _town_road_types[][2] = {
 	{ ROADSIDE_GRASS,         ROADSIDE_GRASS },
 	{ ROADSIDE_PAVED,         ROADSIDE_PAVED },
@@ -2144,34 +2174,46 @@ static void TileLoop_Road(TileIndex tile)
 			SetRoadside(tile, cur_rs);
 			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
 		}
-	} else if (IncreaseRoadWorksCounter(tile)) {
-		TerminateRoadWorks(tile);
+	}
+	else
+	{
+		/* In the first half of roadworks, generate traffic lights with a certain chance. */
+		if (_settings_game.construction.traffic_lights && _settings_game.construction.towns_build_traffic_lights &&
+			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) >= 3) &&
+			!HasTrafficLights(tile) && Chance16(1, 20)) {
+			CmdBuildTrafficLights(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
+			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
+		}
 
-		if (_settings_game.economy.mod_road_rebuild) {
-			/* Generate a nicer town surface */
-			const RoadBits old_rb = GetAnyRoadBits(tile, RTT_ROAD);
-			const RoadBits new_rb = CleanUpRoadBits(tile, old_rb);
+		if (IncreaseRoadWorksCounter(tile)) {
+			TerminateRoadWorks(tile);
 
-			if (old_rb != new_rb) {
-				RemoveRoad(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, (old_rb ^ new_rb), RTT_ROAD, true);
+			if (_settings_game.economy.mod_road_rebuild) {
+				/* Generate a nicer town surface */
+				const RoadBits old_rb = GetAnyRoadBits(tile, RTT_ROAD);
+				const RoadBits new_rb = CleanUpRoadBits(tile, old_rb);
 
-				/* If new_rb is 0, there are now no road pieces left and the tile is no longer a road tile */
-				if (new_rb == 0) {
-					MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
-					return;
+				if (old_rb != new_rb) {
+					RemoveRoad(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, (old_rb ^ new_rb), RTT_ROAD, true, true);
+
+					/* If new_rb is 0, there are now no road pieces left and the tile is no longer a road tile */
+					if (new_rb == 0) {
+						MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
+						return;
+					}
 				}
 			}
-		}
 
-		/* Possibly change road type */
-		if (GetRoadOwner(tile, RTT_ROAD) == OWNER_TOWN) {
-			RoadType rt = GetTownRoadType(t);
-			if (rt != GetRoadTypeRoad(tile)) {
-				SetRoadType(tile, RTT_ROAD, rt);
+			/* Possibly change road type */
+			if (GetRoadOwner(tile, RTT_ROAD) == OWNER_TOWN) {
+				RoadType rt = GetTownRoadType(t);
+				if (rt != GetRoadTypeRoad(tile)) {
+					SetRoadType(tile, RTT_ROAD, rt);
+				}
 			}
-		}
 
-		MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
+			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
+		}
 	}
 }
 
@@ -2206,7 +2248,7 @@ extern const TrackBits _road_trackbits[16] = {
 static TrackStatus GetTileTrackStatus_Road(TileIndex tile, TransportType mode, uint sub_mode, DiagDirection side)
 {
 	TrackdirBits trackdirbits = TRACKDIR_BIT_NONE;
-	TrackdirBits red_signals = TRACKDIR_BIT_NONE; // crossing barred
+	TrackdirBits red_signals = TRACKDIR_BIT_NONE; // Crossing barred or red traffic light.
 	switch (mode) {
 		case TRANSPORT_RAIL:
 			if (IsLevelCrossing(tile)) trackdirbits = TrackBitsToTrackdirBits(GetCrossingRailBits(tile));
@@ -2225,6 +2267,8 @@ static TrackStatus GetTileTrackStatus_Road(TileIndex tile, TransportType mode, u
 
 					uint multiplier = drd_to_multiplier[(rtt == RTT_TRAM) ? DRD_NONE : GetDisallowedRoadDirections(tile)];
 					if (!HasRoadWorks(tile)) trackdirbits = (TrackdirBits)(_road_trackbits[bits] * multiplier);
+					if (_settings_game.construction.traffic_lights && HasTrafficLights(tile))
+						red_signals = trackdirbits & GetTrafficLightDisallowedDirections(tile);
 					break;
 				}
 
@@ -2314,7 +2358,12 @@ static void GetTileDesc_Road(TileIndex tile, TileDesc *td)
 			break;
 
 		default: {
-			td->str = (road_rt != INVALID_ROADTYPE ? _road_tile_strings[GetRoadside(tile)] : STR_LAI_ROAD_DESCRIPTION_TRAMWAY);
+			if (HasTrafficLights(tile)) {
+				td->str = STR_LAI_ROAD_DESCRIPTION_ROAD_WITH_TRAFFIC_LIGHTS;
+			}
+			else {
+				td->str = (road_rt != INVALID_ROADTYPE ? _road_tile_strings[GetRoadside(tile)] : STR_LAI_ROAD_DESCRIPTION_TRAMWAY);
+			}
 			break;
 		}
 	}
@@ -2744,7 +2793,7 @@ extern const TileTypeProcs _tile_type_road_procs = {
 	GetTileDesc_Road,        // get_tile_desc_proc
 	GetTileTrackStatus_Road, // get_tile_track_status_proc
 	ClickTile_Road,          // click_tile_proc
-	nullptr,                    // animate_tile_proc
+	AnimateTile_Road,                    // animate_tile_proc
 	TileLoop_Road,           // tile_loop_proc
 	ChangeTileOwner_Road,    // change_tile_owner_proc
 	nullptr,                    // add_produced_cargo_proc

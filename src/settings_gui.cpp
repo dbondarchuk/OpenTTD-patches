@@ -1907,6 +1907,16 @@ static SettingsContainer &GetSettingsTree()
 				towns->Add(new SettingEntry("economy.random_road_reconstruction"));
 			}
 
+			SettingsPage* tl = towns->Add(new SettingsPage(STR_CONFIG_SETTING_CONSTRUCTION_TRAFFIC_LIGHTS));
+			{
+				tl->Add(new SettingEntry("construction.traffic_lights"));
+				tl->Add(new SettingEntry("construction.towns_build_traffic_lights"));
+				tl->Add(new SettingEntry("construction.allow_building_tls_in_towns"));
+				tl->Add(new SettingEntry("construction.traffic_lights_green_phase"));
+				tl->Add(new SettingEntry("construction.max_tlc_size"));
+				tl->Add(new SettingEntry("construction.max_tlc_distance"));
+			}
+
 			SettingsPage *industries = environment->Add(new SettingsPage(STR_CONFIG_SETTING_ENVIRONMENT_INDUSTRIES));
 			{
 				industries->Add(new SettingEntry("construction.raw_industry_construction"));

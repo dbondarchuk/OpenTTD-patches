@@ -402,6 +402,8 @@ enum Commands {
 	CMD_SET_TIMETABLE_START,          ///< set the date that a timetable should start
 
 	CMD_OPEN_CLOSE_AIRPORT,           ///< open/close an airport to incoming aircraft
+	CMD_BUILD_TRAFFICLIGHTS,          ///< place traffic lights on a road crossing
+	CMD_REMOVE_TRAFFICLIGHTS,         ///< remove traffic lights
 
 	CMD_PROGRAM_TRACERESTRICT_SIGNAL, ///< modify a signal tracerestrict program
 	CMD_CREATE_TRACERESTRICT_SLOT,    ///< create a tracerestrict slot
