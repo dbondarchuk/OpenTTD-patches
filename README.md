@@ -1,3 +1,22 @@
+# dbondarchuk Patchpack version 0.34.4.1
+
+This patchpack is based on JGR's patchpack with some additional known packs and few developed by me specifically for my enjoyment.
+
+* * *
+Added known patches:
+
+1. Traffic lights.
+
+My patches:
+
+1. Building objects by large area - if you like to build highways with eye-candy objects, you would like to place those objects by dragging them (instead of clicking at each tile).
+
+2. Bulk removal of signs - if i.e. some AI creates bunch of signs, you can remove them from sign list window (removes all currently filtered signs).
+
+3. Max locomotive speeds - in case you have a train with 2 (or more) locomotives with different speeds, max speed will be calculated as maximum of speeds of all locomotives, who currently have power.
+
+4. Increased max station spread.
+
 ## JGR's Patchpack version 0.34.4
 
 This is a collection of patches applied to [OpenTTD](http://www.openttd.org/)
@@ -19,7 +38,6 @@ See [below](#openttd) for the original OpenTTD readme.
 The thread for this patchpack can be found [here](http://www.tt-forums.net/viewtopic.php?f=33&t=73469).
 
 See [jgrpp-changelog.md](jgrpp-changelog.md) for changelog.
-
 
 #### This patchpack contains the following
 
