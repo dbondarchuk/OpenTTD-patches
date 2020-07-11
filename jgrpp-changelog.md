@@ -2,6 +2,11 @@
 
 * * *
 
+### v0.34.4.1 (2020-07-11)
+* Added traffic lights
+* Added building objects by large area
+* Added max locomotive speed of different locomotives
+
 ### v0.34.4 (2020-06-05)
 * Fix crash which could occur when pathfinding over railtypes which prohibit 90° turns.
 * Fix vehicle refit when used with per-cargo no-load orders.
