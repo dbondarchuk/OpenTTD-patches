@@ -398,6 +398,14 @@ struct ConstructionSettings {
 	uint32 purchase_land_per_64k_frames;     ///< how many tiles may, over a long period, be purchased per 65536 frames?
 	uint16 purchase_land_frame_burst;        ///< how many tiles may, over a short period, be purchased?
 	uint8  tree_growth_rate;                 ///< tree growth rate
+	
+
+	bool traffic_lights;                     ///< Whether traffic lights are enabled.
+	bool towns_build_traffic_lights;         ///< Whether towns build traffic lights during road construction.
+	bool allow_building_tls_in_towns;        ///< Whether the players are allowed to build traffic lights on town owned roads.
+	uint8 traffic_lights_green_phase;        ///< How long traffic lights' green phase lasts.
+	uint8 max_tlc_size;                      ///< Maximum size for traffic light consists.
+	uint8 max_tlc_distance;                  ///< Maximum distance between traffic lights for synchronising them.
 };
 
 /** Settings related to the AI. */
@@ -442,6 +450,8 @@ struct NPFSettings {
 	uint32 npf_road_drive_through_penalty;   ///< the penalty for going through a drive-through road stop
 	uint32 npf_road_dt_occupied_penalty;     ///< the penalty multiplied by the fill percentage of a drive-through road stop
 	uint32 npf_road_bay_occupied_penalty;    ///< the penalty multiplied by the fill percentage of a road bay
+	
+	uint32 npf_road_trafficlight_penalty;    ///< Penalty for junctions with traffic lights.
 };
 
 /** Settings related to the yet another pathfinder. */
@@ -461,6 +471,8 @@ struct YAPFSettings {
 	bool   rail_firstred_twoway_eol;         ///< treat first red two-way signal as dead end
 	uint32 rail_firstred_penalty;            ///< penalty for first red signal
 	uint32 rail_firstred_exit_penalty;       ///< penalty for first red exit signal
+
+	uint32 road_trafficlight_penalty;        ///< Penalty for junctions with traffic lights.	
 	uint32 rail_lastred_penalty;             ///< penalty for last red signal
 	uint32 rail_lastred_exit_penalty;        ///< penalty for last red exit signal
 	uint32 rail_station_penalty;             ///< penalty for non-target station tile
@@ -532,6 +544,7 @@ struct VehicleSettings {
 	uint8  train_slope_steepness;            ///< Steepness of hills for trains when using realistic acceleration
 	uint8  roadveh_slope_steepness;          ///< Steepness of hills for road vehicles when using realistic acceleration
 	bool   wagon_speed_limits;               ///< enable wagon speed limits
+	bool   max_locomotive_speed_limits;      ///< if enabled, train with two or more locomotives with different speeds, will use max speed of locomotives who has power at the moment
 	bool   disable_elrails;                  ///< when true, the elrails are disabled
 	UnitID max_trains;                       ///< max trains in game per company
 	UnitID max_roadveh;                      ///< max trucks in game per company

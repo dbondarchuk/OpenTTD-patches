@@ -225,6 +225,9 @@ static void LoadSpriteTables()
 	/* Load route step graphics */
 	LoadGrfFile("route_step.grf", SPR_ROUTE_STEP_BASE, i++);
 
+	/* Load traffic lights graphics. */
+	LoadGrfFile("trafficlights.grf", SPR_TRAFFICLIGHTS_BASE, i++);
+
 	/* Initialize the unicode to sprite mapping table */
 	InitializeUnicodeGlyphMap();
 

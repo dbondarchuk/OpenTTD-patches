@@ -21,6 +21,7 @@ set(BASESET_OTHER_SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/progsignals.grf
         ${CMAKE_CURRENT_SOURCE_DIR}/route_step.grf
         ${CMAKE_CURRENT_SOURCE_DIR}/tracerestrict.grf
+        ${CMAKE_CURRENT_SOURCE_DIR}/trafficlights.grf
 )
 
 # Done by the subdirectories, if nforenum / grfcodec is installed

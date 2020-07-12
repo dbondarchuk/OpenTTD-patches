@@ -54,6 +54,7 @@ CommandProc CmdTerraformLand;
 
 CommandProc CmdBuildObject;
 CommandProc CmdPurchaseLandArea;
+CommandProc CmdBuildObjectArea;
 CommandProc CmdBuildHouse;
 CommandProc CmdSellLandArea;
 
@@ -239,6 +240,9 @@ CommandProc CmdSetTimetableStart;
 
 CommandProc CmdOpenCloseAirport;
 
+CommandProc CmdBuildTrafficLights;
+CommandProc CmdRemoveTrafficLights;
+
 CommandProc CmdProgramSignalTraceRestrict;
 CommandProc CmdCreateTraceRestrictSlot;
 CommandProc CmdAlterTraceRestrictSlot;
@@ -291,6 +295,7 @@ static const Command _command_proc_table[] = {
 	DEF_CMD(CmdTerraformLand,           CMD_ALL_TILES | CMD_AUTO, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_TERRAFORM_LAND
 	DEF_CMD(CmdBuildObject,              CMD_NO_WATER | CMD_AUTO, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_BUILD_OBJECT
 	DEF_CMD(CmdPurchaseLandArea,                     CMD_NO_TEST, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_PURCHASE_LAND_AREA
+	DEF_CMD(CmdBuildObjectArea,                      CMD_NO_TEST, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_BUILD_OBJECT_AREA
 	DEF_CMD(CmdBuildHouse,   CMD_DEITY | CMD_NO_WATER | CMD_AUTO, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_BUILD_HOUSE
 	DEF_CMD(CmdBuildTunnel,                 CMD_DEITY | CMD_AUTO, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_BUILD_TUNNEL
 	DEF_CMD(CmdRemoveFromRailStation,                          0, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_REMOVE_FROM_RAIL_STATION
@@ -462,6 +467,8 @@ static const Command _command_proc_table[] = {
 	DEF_CMD(CmdSetTimetableStart,                              0, CMDT_ROUTE_MANAGEMENT      ), // CMD_SET_TIMETABLE_START
 
 	DEF_CMD(CmdOpenCloseAirport,                               0, CMDT_ROUTE_MANAGEMENT      ), // CMD_OPEN_CLOSE_AIRPORT
+	DEF_CMD(CmdBuildTrafficLights,                             0, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_BUILD_TRAFFICLIGHTS
+	DEF_CMD(CmdRemoveTrafficLights,                            0, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_REMOVE_TRAFFICLIGHTS
 
 	DEF_CMD(CmdProgramSignalTraceRestrict,                     0, CMDT_OTHER_MANAGEMENT      ), // CMD_PROGRAM_TRACERESTRICT_SIGNAL
 	DEF_CMD(CmdCreateTraceRestrictSlot,                        0, CMDT_OTHER_MANAGEMENT      ), // CMD_CREATE_TRACERESTRICT_SLOT

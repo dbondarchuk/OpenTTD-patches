@@ -415,13 +415,35 @@ public:
 
 	void OnPlaceObject(Point pt, TileIndex tile) override
 	{
-		DoCommandP(tile, ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index)->Index(),
-				_selected_object_view, CMD_BUILD_OBJECT | CMD_MSG(STR_ERROR_CAN_T_BUILD_OBJECT), CcTerraform);
+		/*DoCommandP(tile, ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index)->Index(),
+				_selected_object_view, CMD_BUILD_OBJECT | CMD_MSG(STR_ERROR_CAN_T_BUILD_OBJECT), CcTerraform);*/
+		VpStartPlaceSizing(tile, VPM_X_AND_Y, DDSP_BUILD_OBJECT);
 	}
 
 	void OnPlaceObjectAbort() override
 	{
 		this->UpdateButtons(_selected_object_class, -1, _selected_object_view);
+	}
+
+	void OnPlaceDrag(ViewportPlaceMethod select_method, ViewportDragDropSelectionProcess select_proc, Point pt) override
+	{
+		VpSelectTilesWithMethod(pt.x, pt.y, select_method);
+	}
+
+	void OnPlaceMouseUp(ViewportPlaceMethod select_method, ViewportDragDropSelectionProcess select_proc, Point pt, TileIndex start_tile, TileIndex end_tile) override
+	{
+		if (pt.x != -1) {
+			switch (select_proc) {
+			case DDSP_BUILD_OBJECT:
+				char buffer[33];
+				itoa(start_tile, buffer, 10);
+				DoCommandP(end_tile, ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index)->Index(),
+					_selected_object_view, CMD_BUILD_OBJECT_AREA | CMD_MSG(STR_ERROR_CAN_T_BUILD_OBJECT), CcTerraform, buffer);
+				break;
+
+			default: break;
+			}
+		}
 	}
 
 	/**
