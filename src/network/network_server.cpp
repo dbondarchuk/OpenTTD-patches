@@ -635,7 +635,6 @@ NetworkRecvStatus ServerNetworkGameSocketHandler::SendMap()
 				break;
 			}
 		}
-		if (has_packets) has_packets = this->savegame->HasPackets();
 
 		if (last_packet) {
 			/* Done reading, make sure saving is done as well */
@@ -2019,7 +2018,7 @@ void NetworkServerMonthlyLoop()
 {
 	NetworkAutoCleanCompanies();
 	NetworkAdminUpdate(ADMIN_FREQUENCY_MONTHLY);
-	if ((_cur_month % 3) == 0) NetworkAdminUpdate(ADMIN_FREQUENCY_QUARTERLY);
+	if ((_cur_date_ymd.month % 3) == 0) NetworkAdminUpdate(ADMIN_FREQUENCY_QUARTERLY);
 }
 
 /** Daily "callback". Called whenever the date changes. */

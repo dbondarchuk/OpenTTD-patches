@@ -15,6 +15,6 @@
 
 void DrawRoadDepotSprite(int x, int y, DiagDirection dir, RoadType rt);
 void UpdateNearestTownForRoadTiles(bool invalidate);
-void DrawRoadDetail(SpriteID img, const TileInfo* ti, int dx, int dy, int h);
+void DrawRoadDetail(SpriteID img, const TileInfo* ti, int dx, int dy, int h, bool transparent);
 
 #endif /* ROAD_CMD_H */

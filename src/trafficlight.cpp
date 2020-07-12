@@ -287,7 +287,7 @@ void DrawTrafficLights(TileInfo* ti)
 			DisallowedRoadDirections drd = DRD_NONE;
 			if (IsTileType(neighbor[i], MP_ROAD) && IsNormalRoad(neighbor[i])) drd = GetDisallowedRoadDirections(neighbor[i]);
 			if (drd != ((i % 2 == 0) ? DRD_SOUTHBOUND : DRD_NORTHBOUND) && drd != DRD_BOTH)
-				DrawRoadDetail(_tls_to_sprites[state][i], ti, _tl_offsets[rs][i].x, _tl_offsets[rs][i].y, 12);
+				DrawRoadDetail(_tls_to_sprites[state][i], ti, _tl_offsets[rs][i].x, _tl_offsets[rs][i].y, 12, false);
 		}
 	}
 }
