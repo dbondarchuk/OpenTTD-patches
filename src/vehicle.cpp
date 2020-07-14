@@ -2007,6 +2007,9 @@ bool Vehicle::HandleBreakdown()
 
 		default:
 			if (!this->current_order.IsType(OT_LOADING)) this->breakdown_ctr--;
+			if (this->type == VEH_ROAD) {
+				RoadVehicle::From(this)->SetRoadVehicleOvertaking(0);
+			}
 			return false;
 	}
 }
