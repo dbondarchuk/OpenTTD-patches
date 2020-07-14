@@ -452,6 +452,7 @@ struct NPFSettings {
 	uint32 npf_road_bay_occupied_penalty;    ///< the penalty multiplied by the fill percentage of a road bay
 	
 	uint32 npf_road_trafficlight_penalty;    ///< Penalty for junctions with traffic lights.
+	uint32 npf_road_two_way_penalty;         ///< The penalty for two-way road
 };
 
 /** Settings related to the yet another pathfinder. */
@@ -472,7 +473,8 @@ struct YAPFSettings {
 	uint32 rail_firstred_penalty;            ///< penalty for first red signal
 	uint32 rail_firstred_exit_penalty;       ///< penalty for first red exit signal
 
-	uint32 road_trafficlight_penalty;        ///< Penalty for junctions with traffic lights.	
+	uint32 road_trafficlight_penalty;        ///< Penalty for junctions with traffic lights.
+	uint32 road_two_way_penalty;             ///< penalty for two way road
 	uint32 rail_lastred_penalty;             ///< penalty for last red signal
 	uint32 rail_lastred_exit_penalty;        ///< penalty for last red exit signal
 	uint32 rail_station_penalty;             ///< penalty for non-target station tile
@@ -567,6 +569,18 @@ struct VehicleSettings {
 	bool   no_train_crash_other_company;     ///< trains cannot crash with trains from other companies
 	bool   flip_direction_all_trains;        ///< enable flipping direction in depot for all train engine types
 	bool   roadveh_articulated_overtaking;   ///< enable articulated road vehicles overtaking other vehicles
+
+	bool limit_vehicle_speed_in_towns;       ///< limit vehicle speed in towns
+	uint16 max_veh_speed_in_towns_two_way;   ///< max speed of vehicle in towns on two-way road
+	uint16 max_veh_speed_in_towns_one_way;   ///< max speed of vehicle in towns on one-way road
+	bool limit_vehicle_speed_outside_towns;  ///< limit vehicle speed outside towns
+	uint16 max_veh_speed_out_towns_two_way;  ///< max speed of vehicle outside towns on two-way road
+	uint16 max_veh_speed_out_towns_one_way;  ///< max speed of vehicle outside towns on one-way road
+	bool limit_vehicle_speed_tunnel_bridge;  ///< limit vehicle speed on bridge and in tunnel
+	bool limit_vehicle_speed_tunnel_bridge_enhanced;  ///< enhanced limit vehicle speed on bridge and in tunnel (based on limit bridge start/end tile (max of limit start/end))
+	uint16 max_veh_speed_tunnel_bridge;      ///< max speed of vehicle on bridge and in tunnel
+	bool limit_vehicle_speed_highway;        ///< Separate speed limit for highways (one-way roads with an object between) in and out of town
+	uint16 max_veh_speed_highway;				 ///< Speed limit on highways. Zero - no limit
 };
 
 /** Settings related to the economy. */
