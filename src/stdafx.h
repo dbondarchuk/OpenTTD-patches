@@ -439,6 +439,7 @@ void NORETURN CDECL error(const char *str, ...) WARN_FORMAT(1, 2);
 void NORETURN CDECL assert_msg_error(int line, const char *file, const char *expr, const char *extra, const char *str, ...) WARN_FORMAT(5, 6);
 const char *assert_tile_info(uint32 tile);
 #define NOT_REACHED() error("NOT_REACHED triggered at line %i of %s", __LINE__, __FILE__)
+#define NOT_REACHED_WITH_MSG(str) error("NOT_REACHED triggered at line %i of %s: %s", __LINE__, __FILE__, str)
 
 /* For non-debug builds with assertions enabled use the special assertion handler. */
 #if defined(NDEBUG) && defined(WITH_ASSERT)
