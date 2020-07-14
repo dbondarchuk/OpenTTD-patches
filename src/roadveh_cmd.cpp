@@ -965,11 +965,22 @@ struct OvertakeData {
 	Trackdir trackdir;
 };
 
+struct SecondLaneData {
+	const RoadVehicle* v;
+};
+
 static Vehicle* EnumFindVehBlockingOvertake(Vehicle* v, void* data)
 {
 	const OvertakeData* od = (OvertakeData*)data;
 
 	return (v->First() == v && v != od->u && v != od->v) ? v : nullptr;
+}
+
+static Vehicle* EnumFindVehOvertaking(Vehicle* v, void* data)
+{
+	const RoadVehicle* cur_v = (RoadVehicle*)data;
+
+	return (v != cur_v && v->First() != cur_v->First() && ((RoadVehicle*)v)->overtaking != 0 && v->cur_speed > cur_v->cur_speed) ? v : nullptr;
 }
 
 /**
@@ -1397,6 +1408,9 @@ bool IndividualRoadVehicleController(RoadVehicle* v, const RoadVehicle* prev)
 				v->SetRoadVehicleOvertaking(0);
 			}
 		}
+		else if (v->breakdown_ctr != 0) {
+			v->SetRoadVehicleOvertaking(0);
+		}
 	}
 
 	/* If this vehicle is in a depot and we've reached this point it must be
@@ -1620,7 +1634,7 @@ bool IndividualRoadVehicleController(RoadVehicle* v, const RoadVehicle* prev)
 		if (!HasBit(r, VETS_ENTERED_WORMHOLE)) {
 			v->cur_image_valid_dir = INVALID_DIR;
 			TileIndex old_tile = v->tile;
-
+			v->prev_tile = v->tile;
 			v->tile = tile;
 			v->state = (byte)dir;
 			v->frame = start_frame;
@@ -1733,11 +1747,32 @@ bool IndividualRoadVehicleController(RoadVehicle* v, const RoadVehicle* prev)
 		 * Check for another vehicle to overtake */
 		RoadVehicle* u = RoadVehFindCloseTo(v, x, y, new_dir);
 
+
+		if (_settings_game.vehicle.try_to_use_two_lanes_on_highway
+			&& v->breakdown_ctr == 0
+			&& v->index % _settings_game.vehicle.chance_of_going_to_second_lane == 0
+			&& IsHighway(v->tile, v->direction)
+			&& v->cur_speed > ((_settings_game.vehicle.min_speed_for_second_lane*2)+2)
+			&& (!_settings_game.vehicle.only_buses_on_second_lane_on_highway || v->IsBus())) {
+			bool is_prev_veh_overtaking = HasVehicleOnPos(v->tile, VEH_ROAD, v, EnumFindVehOvertaking)
+				|| (v->prev_tile != INVALID_TILE && HasVehicleOnPos(v->prev_tile, VEH_ROAD, v, EnumFindVehOvertaking));
+
+			if (!is_prev_veh_overtaking) {
+				v->overtaking_ctr = 0;
+				v->SetRoadVehicleOvertaking(RVSB_DRIVE_SIDE);
+			}
+			else {
+				v->SetRoadVehicleOvertaking(0);
+			}
+		}
+
 		if (u != nullptr) {
 			u = u->First();
 			/* There is a vehicle in front overtake it if possible */
-			if (v->overtaking == 0) RoadVehCheckOvertake(v, u);
-			if (v->overtaking == 0) v->cur_speed = u->cur_speed;
+			if (v->overtaking == 0 && u->overtaking == 0) {
+				if (v->overtaking == 0) RoadVehCheckOvertake(v, u);
+				if (v->overtaking == 0) v->cur_speed = u->cur_speed;
+			}			
 
 			/* In case an RV is stopped in a road stop, why not try to load? */
 			if (v->cur_speed == 0 && IsInsideMM(v->state, RVSB_IN_DT_ROAD_STOP, RVSB_IN_DT_ROAD_STOP_END) &&
