@@ -409,7 +409,7 @@ void DrawStopSign(TileInfo* ti)
 }
 
 void DrawStreetCrossingSign(TileInfo* ti) {
-	if (!IsInTown(ti->tile) || !IsTileType(ti->tile, MP_ROAD)) return;
+	if (!IsInTownOutskirts(ti->tile) || !IsTileType(ti->tile, MP_ROAD)) return;
 	byte rs = _settings_game.vehicle.road_side;
 	if (CountBits(GetAllRoadBits(ti->tile)) == 3) {
 		RoadBits road = GetAllRoadBits(ti->tile);
@@ -425,7 +425,7 @@ void DrawStreetCrossingSign(TileInfo* ti) {
 }
 
 void DrawHydrant(TileInfo* ti) {
-	if (ti->tile % 3 != 0 || !IsInTown(ti->tile) || !IsTileType(ti->tile, MP_ROAD)) return;
+	if (ti->tile % 3 != 0 || !IsInTownOutskirts(ti->tile) || !IsTileType(ti->tile, MP_ROAD)) return;
 
 	RoadBits road = GetAllRoadBits(ti->tile);
 	if (!IsStraightRoad(GetAllRoadBits(ti->tile)) || IsHighway(ti->tile)) return;

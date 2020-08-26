@@ -366,7 +366,7 @@ static int32 NPFRoadPathCost(AyStar *as, AyStarNode *current, OpenListNode *pare
 				}
 			}
 
-			if (!isHighway && IsInTown(tile)) {
+			if (!isHighway && IsInTownOutskirts(tile)) {
 				if (HasTrafficLights(tile)) cost += _settings_game.pf.npf.npf_road_town_penalty; // extra cost for town road
 			}
 

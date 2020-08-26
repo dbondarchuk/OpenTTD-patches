@@ -2168,7 +2168,7 @@ static void TileLoop_Road(TileIndex tile)
 			if ((t->road_build_months != 0 || Chance16(_settings_game.economy.random_road_reconstruction, 1000)) &&
 					(DistanceManhattan(t->xy, tile) < 8 || grp != HZB_TOWN_EDGE) &&
 					IsNormalRoad(tile) && !HasAtMostOneBit(GetAllRoadBits(tile))) {
-				if (GetFoundationSlope(tile) == SLOPE_FLAT && EnsureNoVehicleOnGround(tile).Succeeded() && Chance16(1, 40)) {
+				if (GetFoundationSlope(tile) == SLOPE_FLAT && EnsureNoVehicleOnGround(tile).Succeeded() && Chance16(1, 40) && !IsHighway(tile)) {
 					StartRoadWorks(tile);
 
 					if (_settings_client.sound.ambient) SndPlayTileFx(SND_21_JACKHAMMER, tile);
@@ -2207,18 +2207,26 @@ static void TileLoop_Road(TileIndex tile)
 	}
 	else
 	{
+		/* In the first half of roadworks, generate stop signs with a certain chance. */
+		if (_settings_game.construction.road_signs && _settings_game.construction.road_signs &&
+			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) >= 3) &&
+			!HasTrafficLights(tile) && !HasYieldSign(tile) && !HasStopSign(tile) && Chance16(1, 20)) {
+			CmdBuildStopSign(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
+			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
+		}
+
 		/* In the first half of roadworks, generate traffic lights with a certain chance. */
 		if (_settings_game.construction.traffic_lights && _settings_game.construction.towns_build_traffic_lights &&
 			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) > 3) &&
-			!HasTrafficLights(tile) && !HasYieldSign(tile) && Chance16(1, 20)) {
+			!HasTrafficLights(tile) && !HasYieldSign(tile) && !HasStopSign(tile) && Chance16(1, 20)) {
 			CmdBuildTrafficLights(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
 			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
 		}
 
 		/* In the first half of roadworks, generate yield signs with a certain chance. */
-		if (_settings_game.construction.traffic_lights && _settings_game.construction.towns_build_traffic_lights &&
+		if (_settings_game.construction.road_signs && _settings_game.construction.towns_build_road_signs &&
 			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) == 3) &&
-			!HasTrafficLights(tile) && !HasYieldSign(tile) && Chance16(1, 20)) {
+			!HasTrafficLights(tile) && !HasYieldSign(tile) && !HasStopSign(tile) && Chance16(1, 20)) {
 			CmdBuildYieldSign(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
 			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
 		}

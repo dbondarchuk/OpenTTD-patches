@@ -129,11 +129,11 @@ SpriteID TileZoneCheckBuildEvaluation(TileIndex tile, Owner owner)
 SpriteID TileZoneCheckTownLimits(TileIndex tile, Owner owner)
 {
 	Town* t;
-	HouseZonesBits grp = HZB_TOWN_EDGE;
+	HouseZonesBits grp = HZB_END;
 	t = ClosestTownFromTile(tile, (uint)-1);
-	grp = GetTownRadiusGroup(t, tile);
+	grp = TryGetTownRadiusGroup(t, tile);
 
-	return grp >= HZB_TOWN_OUTSKIRT ? SPR_ZONING_INNER_HIGHLIGHT_LIGHT_BLUE: ZONING_INVALID_SPRITE_ID;
+	return grp >= HZB_TOWN_EDGE && grp < HZB_END ? SPR_ZONING_INNER_HIGHLIGHT_LIGHT_BLUE: ZONING_INVALID_SPRITE_ID;
 }
 
 /**

@@ -222,7 +222,7 @@ static TileIndex GetWormholeOtherEnd(TileIndex tile, RoadVehicle* v) {
 }
 
 static uint16 GetSpeedLimitOnTile(TileIndex tile, RoadVehicle *v) {
-	bool in_town = IsInTown(tile);
+	bool in_town = IsInTownOutskirts(tile);
 	bool one_way = IsOneWayRoad(tile) || (v->prev_tile != INVALID_TILE && IsOneWayRoad(v->prev_tile));
 
 	if (one_way && IsValidDiagDirection(DirToDiagDir(v->direction)) && _settings_game.vehicle.limit_vehicle_speed_highway) {

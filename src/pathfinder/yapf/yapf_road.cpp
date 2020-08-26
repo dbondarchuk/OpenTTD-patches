@@ -138,7 +138,7 @@ protected:
 				}
 			}
 
-			if (!isHighway && IsInTown(tile)) {
+			if (!isHighway && IsInTownOutskirts(tile)) {
 				if (HasTrafficLights(tile)) cost += Yapf().PfGetSettings().road_town_penalty;  // extra cost for town road
 			}
 		}

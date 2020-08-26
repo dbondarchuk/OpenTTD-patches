@@ -70,6 +70,7 @@ static ZoningEvaluationMode DropDownIndexToZoningEvaluationMode(int index)
 
 static int ZoningEvaluationModeToDropDownIndex(ZoningEvaluationMode ev_mode)
 {
+
 	for (int i = 0; i < (int) lengthof(_zone_type_modes); i++) {
 		if (_zone_type_modes[i] == ev_mode) return i;
 	}

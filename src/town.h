@@ -222,15 +222,16 @@ TileIndexDiff GetHouseNorthPart(HouseID &house);
 
 Town *CalcClosestTownFromTile(TileIndex tile, uint threshold = UINT_MAX);
 Town* ClosestTownFromTile(TileIndex tile, uint threshold);
+HouseZonesBits TryGetTownRadiusGroup(const Town* t, TileIndex tile);
 HouseZonesBits GetTownRadiusGroup(const Town* t, TileIndex tile);
 
 
 /**
- * Checks if the tile inside town
+ * Checks if the tile at least inside town outskirts
  * @param t the tile to check
- * @return is tile inside town
+ * @return is tile at least inside town outskirts
  */
-static inline bool IsInTown(TileIndex tile) {
+static inline bool IsInTownOutskirts(TileIndex tile) {
 	Town* t;
 	HouseZonesBits grp = HZB_TOWN_EDGE;
 	t = ClosestTownFromTile(tile, (uint)-1);
@@ -240,13 +241,27 @@ static inline bool IsInTown(TileIndex tile) {
 }
 
 /**
+ * Checks if the tile inside town boundaries
+ * @param t the tile to check
+ * @return is tile inside town boundaries
+ */
+static inline bool IsInTownBoundaries(TileIndex tile) {
+	Town* t;
+	HouseZonesBits grp = HZB_END;
+	t = ClosestTownFromTile(tile, (uint)-1);
+	grp = TryGetTownRadiusGroup(t, tile);
+
+	return grp >= HZB_TOWN_EDGE && grp < HZB_END;
+}
+
+/**
  * Checks if the road is highway
  * @param t the tile to check
  * @return is tile highway
  */
 static inline bool IsHighway(TileIndex tile) {
 	if (!IsOneWayRoad(tile)) return false;
-	if (_settings_game.vehicle.one_way_roads_out_town_as_highway && !IsInTown(tile)) return true;
+	if (_settings_game.vehicle.one_way_roads_out_town_as_highway && !IsInTownOutskirts(tile)) return true;
 
 	RoadBits road = GetRoadBits(tile, RTT_ROAD);
 	if (road != ROAD_X && road != ROAD_Y) return false;
@@ -272,8 +287,6 @@ void UpdateTownRadius(Town *t);
 CommandCost CheckIfAuthorityAllowsNewStation(TileIndex tile, DoCommandFlag flags);
 Town *ClosestTownFromTile(TileIndex tile, uint threshold);
 void ChangeTownRating(Town *t, int add, int max, DoCommandFlag flags);
-HouseZonesBits TryGetTownRadiusGroup(const Town *t, TileIndex tile);
-HouseZonesBits GetTownRadiusGroup(const Town *t, TileIndex tile);
 void SetTownRatingTestMode(bool mode);
 uint GetMaskOfTownActions(int *nump, CompanyID cid, const Town *t);
 bool GenerateTowns(TownLayout layout);
