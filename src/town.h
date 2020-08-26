@@ -235,6 +235,8 @@ static inline bool IsInTownOutskirts(TileIndex tile) {
 	Town* t;
 	HouseZonesBits grp = HZB_TOWN_EDGE;
 	t = ClosestTownFromTile(tile, (uint)-1);
+	if (t == nullptr) return false;
+
 	grp = GetTownRadiusGroup(t, tile);
 
 	return grp >= HZB_TOWN_OUTSKIRT;
@@ -249,9 +251,23 @@ static inline bool IsInTownBoundaries(TileIndex tile) {
 	Town* t;
 	HouseZonesBits grp = HZB_END;
 	t = ClosestTownFromTile(tile, (uint)-1);
+	if (t == nullptr) return false;
+
 	grp = TryGetTownRadiusGroup(t, tile);
 
 	return grp >= HZB_TOWN_EDGE && grp < HZB_END;
+}
+
+/**
+ * Checks if the tile has opposite direction one-way road
+ * @param t the tile to check
+ * @return is tile has opposite direction one-way road
+ */
+static inline bool IsOppositeOneWayRoad(const TileIndex& tile, RoadBits road, DisallowedRoadDirections drd) {
+	return tile != INVALID_TILE // Correct tile
+		&& IsOneWayRoad(tile) // Is one-way road
+		&& GetRoadBits(tile, RTT_ROAD) == road // Same road alignment direction
+		&& GetDisallowedRoadDirections(tile) != drd; // Opposite direction
 }
 
 /**
@@ -273,10 +289,14 @@ static inline bool IsHighway(TileIndex tile) {
 		: (drd == DRD_NORTHBOUND ? DIR_SE : DIR_NW);
 
 	bool isRight = _settings_game.vehicle.road_side;
-	DirDiff directionDiff = isRight ? DIRDIFF_45LEFT : DIRDIFF_45RIGHT;
+	DirDiff directionDiff = isRight ? DIRDIFF_90LEFT : DIRDIFF_90RIGHT;
 	Direction direction = ChangeDir(currentDirection, directionDiff);
 	TileIndex needed_tile = TileAddByDir(tile, direction);
-	return IsTileType(needed_tile, MP_OBJECT);
+
+	if (needed_tile == INVALID_TILE) return false;
+	if (IsTileType(needed_tile, MP_OBJECT)) return true; // Is object (i.e highway diver)
+
+	return IsOppositeOneWayRoad(needed_tile, road, drd) || IsOppositeOneWayRoad(TileAddByDir(needed_tile, direction), road, drd);
 }
 
 void ResetHouses();

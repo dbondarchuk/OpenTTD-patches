@@ -1878,11 +1878,11 @@ STR_CONFIG_SETTING_SET_LIMITVEHSPEED_OUT_OWOW                   :{LTBLUE}Set max
 STR_CONFIG_SETTING_LIMITVEHSPEED_WORMHOLE                       :{LTBLUE}Limit road vehicle speed in tunnel and on bridge: {ORANGE}{STRING}
 STR_CONFIG_SETTING_LIMITVEHSPEED_WORMHOLE_ENHANCED              :{LTBLUE}Limit road vehicle speed in tunnel and on bridge based on max of the limits of start/end: {ORANGE}{STRING}
 STR_CONFIG_SETTING_SET_LIMITVEHSPEED_WORMHOLE                   :{LTBLUE}Set max vehicle speed in tunnel and on bridge: {ORANGE}{STRING}km/h
-STR_CONFIG_SETTING_LIMITVEHSPEED_HIGHWAY                        :{LTBLUE}Limit road vehicle speed on highways (one-way roads with an object between) in and out of town: {ORANGE}{STRING}
+STR_CONFIG_SETTING_LIMITVEHSPEED_HIGHWAY                        :{LTBLUE}Limit road vehicle speed on highways (one-way roads with an object between or two adjusting one-way roads with opposite directions) in and out of town: {ORANGE}{STRING}
 STR_CONFIG_SETTING_SET_LIMITVEHSPEED_HIGHWAY                    :{LTBLUE}Set max vehicle speed on highways (zero - no speed limit): {ORANGE}{STRING}km/h
 
 STR_CONFIG_SETTING_HIGHWAYS                                     :Highways
-STR_CONFIG_SETTING_ONE_WAY_ROADS_OUT_OF_TOWN_AS_HIGHWAY         :{LTBLUE}Consider one way roads outside of towns as highways (no object in the middle)): {ORANGE}{STRING}
+STR_CONFIG_SETTING_ONE_WAY_ROADS_OUT_OF_TOWN_AS_HIGHWAY         :{LTBLUE}Consider any one way roads outside of towns as highway: {ORANGE}{STRING}
 STR_CONFIG_SETTING_BOTH_LANES_ON_HIGHWAY                        :{LTBLUE}Cars will try to use two lanes on the highways: {ORANGE}{STRING}
 STR_CONFIG_SETTING_MIN_SPEED_FOR_SECOND_LANE                    :{LTBLUE}Min speed to go to the second lane on highway: {ORANGE}{STRING}km/h
 STR_CONFIG_SETTING_ONLY_BUSES_ON_SECOND_LANE                    :{LTBLUE}Only buses (any road vehicle with cargo Passengers) will use second lane (doesn't effect overtaking): {ORANGE}{STRING}

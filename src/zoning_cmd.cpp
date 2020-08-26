@@ -131,6 +131,8 @@ SpriteID TileZoneCheckTownLimits(TileIndex tile, Owner owner)
 	Town* t;
 	HouseZonesBits grp = HZB_END;
 	t = ClosestTownFromTile(tile, (uint)-1);
+	if (t == nullptr) return ZONING_INVALID_SPRITE_ID;
+
 	grp = TryGetTownRadiusGroup(t, tile);
 
 	return grp >= HZB_TOWN_EDGE && grp < HZB_END ? SPR_ZONING_INNER_HIGHLIGHT_LIGHT_BLUE: ZONING_INVALID_SPRITE_ID;

@@ -2158,12 +2158,9 @@ static void TileLoop_Road(TileIndex tile)
 	if (IsRoadDepot(tile)) return;
 
 	const Town *t = ClosestTownFromTile(tile, UINT_MAX);
+	const HouseZonesBits grp = t != nullptr ? GetTownRadiusGroup(t, tile) : HZB_TOWN_EDGE;
 	if (!HasRoadWorks(tile)) {
-		HouseZonesBits grp = HZB_TOWN_EDGE;
-
 		if (t != nullptr) {
-			grp = GetTownRadiusGroup(t, tile);
-
 			/* Show an animation to indicate road work */
 			if ((t->road_build_months != 0 || Chance16(_settings_game.economy.random_road_reconstruction, 1000)) &&
 					(DistanceManhattan(t->xy, tile) < 8 || grp != HZB_TOWN_EDGE) &&
@@ -2207,19 +2204,19 @@ static void TileLoop_Road(TileIndex tile)
 	}
 	else
 	{
+		/* In the first half of roadworks, generate traffic lights with a certain chance. */
+		if (_settings_game.construction.traffic_lights && _settings_game.construction.towns_build_traffic_lights &&
+			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) >= 3) && grp >= HZB_TOWN_INNER_SUBURB && grp < HZB_END
+			&& !HasTrafficLights(tile) && Chance16(1, 20)) {
+			CmdBuildTrafficLights(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
+			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
+		}
+
 		/* In the first half of roadworks, generate stop signs with a certain chance. */
 		if (_settings_game.construction.road_signs && _settings_game.construction.road_signs &&
 			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) >= 3) &&
 			!HasTrafficLights(tile) && !HasYieldSign(tile) && !HasStopSign(tile) && Chance16(1, 20)) {
 			CmdBuildStopSign(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
-			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
-		}
-
-		/* In the first half of roadworks, generate traffic lights with a certain chance. */
-		if (_settings_game.construction.traffic_lights && _settings_game.construction.towns_build_traffic_lights &&
-			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) > 3) &&
-			!HasTrafficLights(tile) && !HasYieldSign(tile) && !HasStopSign(tile) && Chance16(1, 20)) {
-			CmdBuildTrafficLights(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
 			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
 		}
 

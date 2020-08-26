@@ -312,14 +312,14 @@ static inline void MakeYieldSign(TileIndex t)
 {
 	assert(IsTileType(t, MP_ROAD));
 	assert(GetRoadTileType(t) == ROAD_TILE_NORMAL);
-	SetBit(_me[t].m7, 3);
+	SetBit(_me[t].m8, 14);
 }
 
 static inline void ClearYieldSign(TileIndex t)
 {
 	assert(IsTileType(t, MP_ROAD));
 	assert(GetRoadTileType(t) == ROAD_TILE_NORMAL);
-	ClrBit(_me[t].m7, 3);
+	ClrBit(_me[t].m8, 14);
 }
 
 /**
@@ -328,21 +328,21 @@ static inline void ClearYieldSign(TileIndex t)
  */
 static inline bool HasYieldSign(TileIndex t)
 {
-	return (IsTileType(t, MP_ROAD) && (GetRoadTileType(t) == ROAD_TILE_NORMAL) && HasBit(_me[t].m7, 3));
+	return (IsTileType(t, MP_ROAD) && (GetRoadTileType(t) == ROAD_TILE_NORMAL) && HasBit(_me[t].m8, 14));
 }
 
 static inline void MakeStopSign(TileIndex t)
 {
 	assert(IsTileType(t, MP_ROAD));
 	assert(GetRoadTileType(t) == ROAD_TILE_NORMAL);
-	SetBit(_me[t].m7, 2);
+	SetBit(_me[t].m8, 13);
 }
 
 static inline void ClearStopSign(TileIndex t)
 {
 	assert(IsTileType(t, MP_ROAD));
 	assert(GetRoadTileType(t) == ROAD_TILE_NORMAL);
-	ClrBit(_me[t].m7, 2);
+	ClrBit(_me[t].m8, 13);
 }
 
 /**
@@ -351,7 +351,7 @@ static inline void ClearStopSign(TileIndex t)
  */
 static inline bool HasStopSign(TileIndex t)
 {
-	return (IsTileType(t, MP_ROAD) && (GetRoadTileType(t) == ROAD_TILE_NORMAL) && HasBit(_me[t].m7, 2));
+	return (IsTileType(t, MP_ROAD) && (GetRoadTileType(t) == ROAD_TILE_NORMAL) && HasBit(_me[t].m8, 13));
 }
 
 
@@ -398,7 +398,7 @@ static inline void SetDisallowedRoadDirections(TileIndex t, DisallowedRoadDirect
 static inline bool IsOneWayRoad(TileIndex tile) {
 	if (!IsTileType(tile, MP_ROAD) || !IsNormalRoadTile(tile)) return false;
 	DisallowedRoadDirections drd = GetDisallowedRoadDirections(tile);
-	return drd > DRD_NONE&& drd < DRD_BOTH;
+	return drd > DRD_NONE && drd < DRD_BOTH;
 }
 
 /**
