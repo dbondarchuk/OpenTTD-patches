@@ -38,6 +38,7 @@
 #include "company_gui.h"
 #include "road_func.h"
 #include "trafficlight_func.h"
+#include "roadsigns_func.h"
 
 #include "table/strings.h"
 #include "table/roadtypes.h"
@@ -518,6 +519,11 @@ static CommandCost RemoveRoad(TileIndex tile, DoCommandFlag flags, RoadBits piec
 			/* Check if traffic lights are present and if removing them would cause the tile to have less than three roadbits (of any kind!). */
 			if (trafficlights_check && HasTrafficLights(tile) && (CountBits(present | other) < 3)) {
 				return_cmd_error(STR_ERROR_MUST_REMOVE_TRAFFIC_LIGHTS_FIRST);
+			};
+
+			/* Check if traffic lights are present and if removing them would cause the tile to have less than three roadbits (of any kind!). */
+			if (trafficlights_check && HasYieldSign(tile) && (CountBits(present | other) !=3)) {
+				return_cmd_error(STR_ERROR_MUST_REMOVE_TRAFFIC_LIGHTS_FIRST);
 			}
 
 			/* Check for invalid RoadBit combinations on slopes */
@@ -778,6 +784,14 @@ CommandCost CmdBuildRoad(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 						}
 						return_cmd_error(STR_ERROR_ALREADY_BUILT);
 					}
+
+					// We need to remove yield sign if it is 3-way crossing no more 
+					if (CountBits(existing | pieces) != 3 && HasYieldSign(tile)) {
+						CommandCost ys_ret = CmdRemoveYieldSign(tile, flags, 0, 0, 0);
+						if (ys_ret.Failed()) return ys_ret;
+						cost.AddCost(ys_ret);
+					}
+
 					/* Disallow breaking end-of-line of someone else
 					 * so trams can still reverse on this tile. */
 					if (rtt == RTT_TRAM && HasExactlyOneBit(existing)) {
@@ -1446,6 +1460,13 @@ static CommandCost ClearTile_Road(TileIndex tile, DoCommandFlag flags)
 					ret.AddCost(tl_ret);
 				}
 
+				/* Remove yield sign if necessary. */
+				if (HasYieldSign(tile)) {
+					CommandCost ys_ret = CmdRemoveYieldSign(tile, flags, 0, 0, 0);
+					if (ys_ret.Failed()) return ys_ret;
+					ret.AddCost(ys_ret);
+				}
+
 				FOR_ALL_ROADTRAMTYPES(rtt) {
 					if (!MayHaveRoad(tile) || GetRoadType(tile, rtt) == INVALID_ROADTYPE) continue;
 
@@ -1829,6 +1850,9 @@ void DrawRoadBits(TileInfo *ti)
 	}
 
 	if (_settings_game.construction.traffic_lights && HasTrafficLights(ti->tile) && _cur_dpi->zoom <= ZOOM_LVL_DETAIL) DrawTrafficLights(ti);
+	if (_settings_game.construction.road_signs && HasYieldSign(ti->tile) && _cur_dpi->zoom <= ZOOM_LVL_DETAIL) DrawYieldSign(ti);
+	if (_settings_game.construction.road_signs && HasStopSign(ti->tile) && _cur_dpi->zoom <= ZOOM_LVL_DETAIL) DrawStopSign(ti);
+	if (_settings_game.construction.road_signs && _settings_game.construction.allow_eye_candy_road_signs) DrawAdditionalSigns(ti);
 
 	/* Draw road, tram catenary */
 	DrawRoadCatenary(ti);
@@ -1845,6 +1869,8 @@ void DrawRoadBits(TileInfo *ti)
 
 		if (height < minz) return;
 	}
+
+	if (IsHighway(ti->tile) && (roadside == ROADSIDE_TREES || roadside == ROADSIDE_STREET_LIGHTS)) return;
 
 	/* If there are no road bits, return, as there is nothing left to do */
 	if (HasAtMostOneBit(road)) return;
@@ -2183,9 +2209,17 @@ static void TileLoop_Road(TileIndex tile)
 	{
 		/* In the first half of roadworks, generate traffic lights with a certain chance. */
 		if (_settings_game.construction.traffic_lights && _settings_game.construction.towns_build_traffic_lights &&
-			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) >= 3) &&
-			!HasTrafficLights(tile) && Chance16(1, 20)) {
+			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) > 3) &&
+			!HasTrafficLights(tile) && !HasYieldSign(tile) && Chance16(1, 20)) {
 			CmdBuildTrafficLights(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
+			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
+		}
+
+		/* In the first half of roadworks, generate yield signs with a certain chance. */
+		if (_settings_game.construction.traffic_lights && _settings_game.construction.towns_build_traffic_lights &&
+			(GetRoadWorksCounter(tile) < 8) && (CountBits(GetRoadBits(tile, RTT_ROAD)) == 3) &&
+			!HasTrafficLights(tile) && !HasYieldSign(tile) && Chance16(1, 20)) {
+			CmdBuildYieldSign(tile, DC_EXEC | DC_AUTO | DC_NO_WATER, 0, 0, 0);
 			MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
 		}
 
@@ -2273,6 +2307,10 @@ static TrackStatus GetTileTrackStatus_Road(TileIndex tile, TransportType mode, u
 					if (!HasRoadWorks(tile)) trackdirbits = (TrackdirBits)(_road_trackbits[bits] * multiplier);
 					if (_settings_game.construction.traffic_lights && HasTrafficLights(tile))
 						red_signals = trackdirbits & GetTrafficLightDisallowedDirections(tile);
+					if (_settings_game.construction.traffic_lights && HasYieldSign(tile))
+						red_signals = trackdirbits & GetYieldSignDisallowedDirections(tile);
+					if (_settings_game.construction.traffic_lights && HasStopSign(tile))
+						red_signals = trackdirbits & GetStopSignDisallowedDirections(tile);
 					break;
 				}
 

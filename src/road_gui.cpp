@@ -91,6 +91,44 @@ static void PlaceRoad_TrafficLights(TileIndex tile, Window* w)
 	}
 }
 
+
+/**
+ * Place yield sign on a tile or returns an error.
+ * @param tile This tile.
+ */
+static void PlaceRoad_YieldSign(TileIndex tile, Window* w)
+{
+	if (_remove_button_clicked) {
+		DoCommandP(tile, 0, 0, CMD_REMOVE_YIELDSIGN | CMD_MSG(STR_ERROR_CAN_T_REMOVE_ROAD_SIGNS_FROM), CcPlaySound_SPLAT_OTHER);
+	}
+	else {
+		if (!_settings_game.construction.traffic_lights) {
+			DoCommandP(tile, 0, 0, CMD_BUILD_YIELDSIGN | CMD_MSG(STR_ERROR_BUILDING_ROAD_SIGNS_DISABLED), CcPlaySound_SPLAT_OTHER);
+		}
+		else {
+			DoCommandP(tile, 0, 0, CMD_BUILD_YIELDSIGN | CMD_MSG(STR_ERROR_CAN_T_PLACE_ROAD_SIGN), CcPlaySound_SPLAT_OTHER);
+		}
+	}
+}
+
+/**
+ * Place stop sign on a tile or returns an error.
+ * @param tile This tile.
+ */
+static void PlaceRoad_StopSign(TileIndex tile, Window* w)
+{
+	if (_remove_button_clicked) {
+		DoCommandP(tile, 0, 0, CMD_REMOVE_STOPSIGN | CMD_MSG(STR_ERROR_CAN_T_REMOVE_ROAD_SIGNS_FROM), CcPlaySound_SPLAT_OTHER);
+	}
+	else {
+		if (!_settings_game.construction.traffic_lights) {
+			DoCommandP(tile, 0, 0, CMD_BUILD_STOPSIGN | CMD_MSG(STR_ERROR_BUILDING_ROAD_SIGNS_DISABLED), CcPlaySound_SPLAT_OTHER);
+		}
+		else {
+			DoCommandP(tile, 0, 0, CMD_BUILD_STOPSIGN | CMD_MSG(STR_ERROR_CAN_T_PLACE_ROAD_SIGN), CcPlaySound_SPLAT_OTHER);
+		}
+	}
+}
 /**
  * Callback to start placing a bridge.
  * @param tile Start tile of the bridge.
@@ -289,6 +327,18 @@ static bool RoadToolbar_CtrlChanged(Window *w)
 		return true;
 	}
 
+	/* Allow ctrl also for yield signs. */
+	if (w->IsWidgetLowered(WID_ROT_YIELD_SIGN)) {
+		ToggleRoadButton_Remove(w);
+		return true;
+	}
+
+	/* Allow ctrl also for stop signs. */
+	if (w->IsWidgetLowered(WID_ROT_STOP_SIGN)) {
+		ToggleRoadButton_Remove(w);
+		return true;
+	}
+
 	return false;
 }
 
@@ -313,6 +363,14 @@ struct BuildRoadToolbarWindow : Window {
 			WID_ROT_TRAFFIC_LIGHT,
 			WIDGET_LIST_END);
 		if (!_settings_game.construction.traffic_lights && this->IsWidgetLowered(WID_ROT_TRAFFIC_LIGHT)) ResetObjectToPlace();
+		this->SetWidgetsDisabledState(!_settings_game.construction.traffic_lights,
+			WID_ROT_YIELD_SIGN,
+			WIDGET_LIST_END);
+		if (!_settings_game.construction.traffic_lights && this->IsWidgetLowered(WID_ROT_YIELD_SIGN)) ResetObjectToPlace();
+		this->SetWidgetsDisabledState(!_settings_game.construction.traffic_lights,
+			WID_ROT_STOP_SIGN,
+			WIDGET_LIST_END);
+		if (!_settings_game.construction.traffic_lights && this->IsWidgetLowered(WID_ROT_STOP_SIGN)) ResetObjectToPlace();
 
 		this->OnInvalidateData();
 		this->last_started_action = WIDGET_LIST_END;
@@ -412,6 +470,8 @@ struct BuildRoadToolbarWindow : Window {
 			case WID_ROT_BUS_STATION:
 			case WID_ROT_TRUCK_STATION:
 			case WID_ROT_TRAFFIC_LIGHT:
+			case WID_ROT_YIELD_SIGN:
+			case WID_ROT_STOP_SIGN:
 				if (RoadTypeIsRoad(this->roadtype)) this->DisableWidget(WID_ROT_ONE_WAY);
 				this->SetWidgetDisabledState(WID_ROT_REMOVE, !this->IsWidgetLowered(clicked_widget));
 				break;
@@ -501,6 +561,16 @@ struct BuildRoadToolbarWindow : Window {
 				this->last_started_action = widget;
 				break;
 
+			case WID_ROT_YIELD_SIGN:
+				HandlePlacePushButton(this, WID_ROT_YIELD_SIGN, SPR_CURSOR_YIELDSIGN, HT_RECT);
+				this->last_started_action = widget;
+				break;
+
+			case WID_ROT_STOP_SIGN:
+				HandlePlacePushButton(this, WID_ROT_STOP_SIGN, SPR_CURSOR_STOPSIGN, HT_RECT);
+				this->last_started_action = widget;
+				break;
+
 			case WID_ROT_BUILD_BRIDGE:
 				HandlePlacePushButton(this, WID_ROT_BUILD_BRIDGE, SPR_CURSOR_BRIDGE, HT_RECT);
 				this->last_started_action = widget;
@@ -579,6 +649,14 @@ struct BuildRoadToolbarWindow : Window {
 
 			case WID_ROT_TRAFFIC_LIGHT:
 				PlaceRoad_TrafficLights(tile, this);
+				break;
+
+			case WID_ROT_YIELD_SIGN:
+				PlaceRoad_YieldSign(tile, this);
+				break;
+
+			case WID_ROT_STOP_SIGN:
+				PlaceRoad_StopSign(tile, this);
 				break;
 
 			case WID_ROT_BUILD_BRIDGE:
@@ -841,6 +919,10 @@ static const NWidgetPart _nested_build_road_widgets[] = {
 						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_ROAD_ONE_WAY, STR_ROAD_TOOLBAR_TOOLTIP_TOGGLE_ONE_WAY_ROAD),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_TRAFFIC_LIGHT),
 						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_TRAFFIC_LIGHT, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAFFIC_LIGHT),
+		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_YIELD_SIGN),
+						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_YIELDSIGN, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_YIELD_SIGN),
+		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_STOP_SIGN),
+						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_STOPSIGN, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_STOP_SIGN),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_BUILD_BRIDGE),
 						SetFill(0, 1), SetMinimalSize(43, 22), SetDataTip(SPR_IMG_BRIDGE, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_ROAD_BRIDGE),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_BUILD_TUNNEL),
@@ -884,6 +966,10 @@ static const NWidgetPart _nested_build_tramway_widgets[] = {
 		NWidget(WWT_PANEL, COLOUR_DARK_GREEN, -1), SetMinimalSize(0, 22), SetFill(1, 1), EndContainer(),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_TRAFFIC_LIGHT),
 						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_TRAFFIC_LIGHT, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAFFIC_LIGHT),
+		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_YIELD_SIGN),
+						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_YIELDSIGN, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_YIELD_SIGN),
+		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_STOP_SIGN),
+						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_STOPSIGN, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_STOP_SIGN),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_BUILD_BRIDGE),
 						SetFill(0, 1), SetMinimalSize(43, 22), SetDataTip(SPR_IMG_BRIDGE, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAMWAY_BRIDGE),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_BUILD_TUNNEL),
@@ -941,6 +1027,10 @@ static const NWidgetPart _nested_build_road_scen_widgets[] = {
 						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_ROAD_ONE_WAY, STR_ROAD_TOOLBAR_TOOLTIP_TOGGLE_ONE_WAY_ROAD),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_TRAFFIC_LIGHT),
 						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_TRAFFIC_LIGHT, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAFFIC_LIGHT),
+		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_YIELD_SIGN),
+						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_YIELDSIGN, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_YIELD_SIGN),
+		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_STOP_SIGN),
+						SetFill(0, 1), SetMinimalSize(22, 22), SetDataTip(SPR_IMG_STOPSIGN, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_STOP_SIGN),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_BUILD_BRIDGE),
 						SetFill(0, 1), SetMinimalSize(43, 22), SetDataTip(SPR_IMG_BRIDGE, STR_ROAD_TOOLBAR_TOOLTIP_BUILD_ROAD_BRIDGE),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_ROT_BUILD_TUNNEL),

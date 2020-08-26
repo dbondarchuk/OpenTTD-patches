@@ -27,6 +27,7 @@
 #include "trafficlight_type.h"
 #include "date_func.h"
 #include "company_func.h"
+#include "roadsigns_func.h"
 
 #include "table/sprites.h"
 #include "table/strings.h"
@@ -211,13 +212,27 @@ CommandCost CmdBuildTrafficLights(TileIndex tile, DoCommandFlag flags, uint32 p1
 
 	if (!CheckTLCSize(tile)) return_cmd_error(STR_ERROR_TRAFFIC_LIGHT_CONSIST_TOO_BIG);
 
+	CommandCost cost = CommandCost(EXPENSES_CONSTRUCTION, _price[PR_BUILD_SIGNALS]);
+	if (HasYieldSign(tile)) {
+		CommandCost ys_ret = CmdRemoveYieldSign(tile, flags, 0, 0, 0);
+		if (ys_ret.Failed()) return ys_ret;
+		cost.AddCost(ys_ret);
+	}
+
+	if (HasStopSign(tile)) {
+		CommandCost ys_ret = CmdRemoveStopSign(tile, flags, 0, 0, 0);
+		if (ys_ret.Failed()) return ys_ret;
+		cost.AddCost(ys_ret);
+	}
+
 	/* Now we may build the traffic lights. */
 	if (flags & DC_EXEC) {
 		MakeTrafficLights(tile);
 		AddAnimatedTile(tile);
 		MarkTileDirtyByTile(tile, ZOOM_LVL_DRAW_MAP);
 	}
-	return CommandCost(EXPENSES_CONSTRUCTION, _price[PR_BUILD_SIGNALS]);
+
+	return cost;
 }
 
 /**

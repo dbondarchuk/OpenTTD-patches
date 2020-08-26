@@ -19,6 +19,7 @@
 enum ZoningEvaluationMode {
 	ZEM_NOTHING = 0,   ///< No zoning action selected
 	ZEM_AUTHORITY,     ///< Check the local authority's opinion.
+	ZEM_TOWNLIMITS,    ///< Check town limits.
 	ZEM_CAN_BUILD,     ///< Check wither or not the player can build.
 	ZEM_STA_CATCH,     ///< Check catchment area for stations
 	ZEM_STA_CATCH_WIN, ///< Check catchment area for stations with their station windows open

@@ -43,6 +43,7 @@
 #include "table/strings.h"
 
 #include "safeguards.h"
+#include <road_cmd.h>
 
 static const uint16 _roadveh_images[] = {
 	0xCD4, 0xCDC, 0xCE4, 0xCEC, 0xCF4, 0xCFC, 0xD0C, 0xD14,
@@ -210,34 +211,22 @@ static uint GetRoadVehLength(const RoadVehicle* v)
 	return length;
 }
 
+static TileIndex GetWormholeOtherEnd(TileIndex tile, RoadVehicle* v) {
+	bool path_found = false;
+	TileIndex otherEnd = GetOtherTunnelBridgeEnd(tile);
+	Trackdir direction = NPFRoadVehicleChooseTrack(v, otherEnd, ReverseDiagDir(GetTunnelBridgeDirection(otherEnd)), path_found);
+	DiagDirection needed = DirToDiagDir(TrackdirToDirection(direction));
 
-static bool IsInTown(TileIndex tile) {
-	Town* t;
-	HouseZonesBits grp = HZB_TOWN_EDGE;
-	t = ClosestTownFromTile(tile, (uint)-1);
-	grp = GetTownRadiusGroup(t, tile);
-
-	return grp >= HZB_TOWN_OUTSKIRT;
+	TileIndex nextTile = otherEnd + TileOffsByDiagDir(needed);
+	return nextTile;
 }
 
-static bool IsOneWay(TileIndex tile) {
-	return IsTileType(tile, MP_ROAD) && IsNormalRoadTile(tile) && GetDisallowedRoadDirections(tile) != DRD_NONE;
-}
-
-static bool IsHighway(TileIndex tile, Direction currentDirection) {
-	bool isRight = _settings_game.vehicle.road_side;
-	DirDiff directionDiff = isRight ? DIRDIFF_45LEFT : DIRDIFF_45RIGHT;
-	Direction direction = ChangeDir(currentDirection, directionDiff);
-	TileIndex needed_tile = TileAddByDir(tile, direction);
-	return IsTileType(needed_tile, MP_OBJECT);
-}
-
-static uint16 GetSpeedLimitOnTile(TileIndex tile, TileIndex prev_tile, RoadVehicle *v) {
+static uint16 GetSpeedLimitOnTile(TileIndex tile, RoadVehicle *v) {
 	bool in_town = IsInTown(tile);
-	bool one_way = IsOneWay(tile) || (prev_tile != INVALID_TILE && IsOneWay(prev_tile));
+	bool one_way = IsOneWayRoad(tile) || (v->prev_tile != INVALID_TILE && IsOneWayRoad(v->prev_tile));
 
 	if (one_way && IsValidDiagDirection(DirToDiagDir(v->direction)) && _settings_game.vehicle.limit_vehicle_speed_highway) {
-		if (IsHighway(tile, v->direction)) {
+		if (IsHighway(tile) || (v->prev_tile != INVALID_TILE && IsHighway(v->prev_tile))) {
 			return _settings_game.vehicle.max_veh_speed_highway > 0 ? ((_settings_game.vehicle.max_veh_speed_highway * 2) + 2) : UINT16_MAX;
 		}
 	}
@@ -300,19 +289,14 @@ uint16 CalcMaxRoadVehSpeed(RoadVehicle* v, TileIndex prev_tile) {
 		if (_settings_game.vehicle.limit_vehicle_speed_tunnel_bridge
 			&& _settings_game.vehicle.limit_vehicle_speed_tunnel_bridge_enhanced
 			&& (IsTunnelTile(v->tile) || IsBridgeTile(v->tile))) {
-			TileIndex otherEnd = GetOtherTunnelBridgeEnd(v->tile);
-			bool path_found = false;
-			Trackdir direction = NPFRoadVehicleChooseTrack(v, otherEnd, ReverseDiagDir(GetTunnelBridgeDirection(otherEnd)), path_found);
-			DiagDirection needed = DirToDiagDir(TrackdirToDirection(direction));
-
-			TileIndex nextTile = otherEnd + TileOffsByDiagDir(needed);;
-			uint16 speedLimitOnOtherEnd = GetSpeedLimitOnTile(nextTile, prev_tile, v);
+			TileIndex nextTile = GetWormholeOtherEnd(v->tile, v);
+			uint16 speedLimitOnOtherEnd = GetSpeedLimitOnTile(nextTile, v);
 
 			v->limit_speed = v->limit_speed || speedLimitOnOtherEnd ? max(v->limit_speed, speedLimitOnOtherEnd) : max_speed;
 			return v->limit_speed;
 		}
 
-		v->limit_speed = GetSpeedLimitOnTile(v->tile, prev_tile, v);
+		v->limit_speed = GetSpeedLimitOnTile(v->tile, v);
 		if (v->limit_speed) {
 			return max(v->limit_speed, (uint16)max_speed);
 		}
@@ -1235,6 +1219,9 @@ static Trackdir RoadFindPathToDest(RoadVehicle* v, TileIndex tile, DiagDirection
 found_best_track:;
 
 	if (HasBit(red_signals, best_track)) return INVALID_TRACKDIR;
+	if (_settings_game.construction.road_signs && !IsReversingRoadTrackdir(best_track) && HasStopSign(tile) && ++v->blocked_ctr < 5) return INVALID_TRACKDIR;
+
+	v->blocked_ctr = 0;
 
 	return best_track;
 }
@@ -1747,18 +1734,26 @@ bool IndividualRoadVehicleController(RoadVehicle* v, const RoadVehicle* prev)
 		 * Check for another vehicle to overtake */
 		RoadVehicle* u = RoadVehFindCloseTo(v, x, y, new_dir);
 
+		bool isGoodTile = IsHighway(v->tile) || (v->prev_tile != INVALID_TILE && IsHighway(v->prev_tile));
+		/*if (!isGoodTile) {
+			bool isWormhole = IsBridgeTile(v->tile) || IsTunnelTile(v->tile);
+			if (isWormhole && v->prev_tile != INVALID_TILE) {
+				TileIndex nextTile = GetWormholeOtherEnd(v->tile, v);
+				isGoodTile = IsOneWay(v->prev_tile) && IsOneWay(nextTile);
+			}
+		}*/
 
 		if (_settings_game.vehicle.try_to_use_two_lanes_on_highway
 			&& v->breakdown_ctr == 0
 			&& v->index % _settings_game.vehicle.chance_of_going_to_second_lane == 0
-			&& IsHighway(v->tile, v->direction)
+			&& isGoodTile
 			&& v->cur_speed > ((_settings_game.vehicle.min_speed_for_second_lane*2)+2)
 			&& (!_settings_game.vehicle.only_buses_on_second_lane_on_highway || v->IsBus())) {
 			bool is_prev_veh_overtaking = HasVehicleOnPos(v->tile, VEH_ROAD, v, EnumFindVehOvertaking)
 				|| (v->prev_tile != INVALID_TILE && HasVehicleOnPos(v->prev_tile, VEH_ROAD, v, EnumFindVehOvertaking));
 
 			if (!is_prev_veh_overtaking) {
-				v->overtaking_ctr = 0;
+				v->overtaking_ctr = RV_OVERTAKE_TIMEOUT / 2;
 				v->SetRoadVehicleOvertaking(RVSB_DRIVE_SIDE);
 			}
 			else {

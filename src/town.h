@@ -216,10 +216,51 @@ enum TownFlags {
 
 CommandCost CheckforTownRating(DoCommandFlag flags, Town *t, TownRatingCheckType type);
 
-
 TileIndexDiff GetHouseNorthPart(HouseID &house);
 
 Town *CalcClosestTownFromTile(TileIndex tile, uint threshold = UINT_MAX);
+Town* ClosestTownFromTile(TileIndex tile, uint threshold);
+HouseZonesBits GetTownRadiusGroup(const Town* t, TileIndex tile);
+
+
+/**
+ * Checks if the tile inside town
+ * @param t the tile to check
+ * @return is tile inside town
+ */
+static inline bool IsInTown(TileIndex tile) {
+	Town* t;
+	HouseZonesBits grp = HZB_TOWN_EDGE;
+	t = ClosestTownFromTile(tile, (uint)-1);
+	grp = GetTownRadiusGroup(t, tile);
+
+	return grp >= HZB_TOWN_OUTSKIRT;
+}
+
+/**
+ * Checks if the road is highway
+ * @param t the tile to check
+ * @return is tile highway
+ */
+static inline bool IsHighway(TileIndex tile) {
+	if (!IsOneWayRoad(tile)) return false;
+	if (_settings_game.vehicle.one_way_roads_out_town_as_highway && !IsInTown(tile)) return true;
+
+	RoadBits road = GetRoadBits(tile, RTT_ROAD);
+	if (road != ROAD_X && road != ROAD_Y) return false;
+
+	DisallowedRoadDirections drd = GetDisallowedRoadDirections(tile);
+	Direction currentDirection =
+		road == ROAD_X
+		? (drd == DRD_NORTHBOUND ? DIR_NE : DIR_SW)
+		: (drd == DRD_NORTHBOUND ? DIR_SE : DIR_NW);
+
+	bool isRight = _settings_game.vehicle.road_side;
+	DirDiff directionDiff = isRight ? DIRDIFF_45LEFT : DIRDIFF_45RIGHT;
+	Direction direction = ChangeDir(currentDirection, directionDiff);
+	TileIndex needed_tile = TileAddByDir(tile, direction);
+	return IsTileType(needed_tile, MP_OBJECT);
+}
 
 void ResetHouses();
 

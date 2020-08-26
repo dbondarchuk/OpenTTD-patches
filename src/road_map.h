@@ -308,6 +308,52 @@ static inline bool HasTrafficLights(TileIndex t)
 	return (IsTileType(t, MP_ROAD) && (GetRoadTileType(t) == ROAD_TILE_NORMAL) && HasBit(_me[t].m7, 4));
 }
 
+static inline void MakeYieldSign(TileIndex t)
+{
+	assert(IsTileType(t, MP_ROAD));
+	assert(GetRoadTileType(t) == ROAD_TILE_NORMAL);
+	SetBit(_me[t].m7, 3);
+}
+
+static inline void ClearYieldSign(TileIndex t)
+{
+	assert(IsTileType(t, MP_ROAD));
+	assert(GetRoadTileType(t) == ROAD_TILE_NORMAL);
+	ClrBit(_me[t].m7, 3);
+}
+
+/**
+ * Check if a tile has yield sign
+ * @param t The tile to check.
+ */
+static inline bool HasYieldSign(TileIndex t)
+{
+	return (IsTileType(t, MP_ROAD) && (GetRoadTileType(t) == ROAD_TILE_NORMAL) && HasBit(_me[t].m7, 3));
+}
+
+static inline void MakeStopSign(TileIndex t)
+{
+	assert(IsTileType(t, MP_ROAD));
+	assert(GetRoadTileType(t) == ROAD_TILE_NORMAL);
+	SetBit(_me[t].m7, 2);
+}
+
+static inline void ClearStopSign(TileIndex t)
+{
+	assert(IsTileType(t, MP_ROAD));
+	assert(GetRoadTileType(t) == ROAD_TILE_NORMAL);
+	ClrBit(_me[t].m7, 2);
+}
+
+/**
+ * Check if a tile has stop sign
+ * @param t The tile to check.
+ */
+static inline bool HasStopSign(TileIndex t)
+{
+	return (IsTileType(t, MP_ROAD) && (GetRoadTileType(t) == ROAD_TILE_NORMAL) && HasBit(_me[t].m7, 2));
+}
+
 
 /** Which directions are disallowed ? */
 enum DisallowedRoadDirections {
@@ -342,6 +388,17 @@ static inline void SetDisallowedRoadDirections(TileIndex t, DisallowedRoadDirect
 	assert_tile(IsNormalRoad(t), t);
 	assert(drd < DRD_END);
 	SB(_m[t].m5, 4, 2, drd);
+}
+
+/**
+ * Checks if the road is one-way road
+ * @param t the tile to check
+ * @return is tile one-way road
+ */
+static inline bool IsOneWayRoad(TileIndex tile) {
+	if (!IsTileType(tile, MP_ROAD) || !IsNormalRoadTile(tile)) return false;
+	DisallowedRoadDirections drd = GetDisallowedRoadDirections(tile);
+	return drd > DRD_NONE&& drd < DRD_BOTH;
 }
 
 /**

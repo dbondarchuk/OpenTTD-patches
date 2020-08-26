@@ -1929,14 +1929,22 @@ static SettingsContainer &GetSettingsTree()
 				towns->Add(new SettingEntry("economy.random_road_reconstruction"));
 			}
 
-			SettingsPage* tl = towns->Add(new SettingsPage(STR_CONFIG_SETTING_CONSTRUCTION_TRAFFIC_LIGHTS));
+			SettingsPage* rs = towns->Add(new SettingsPage(STR_CONFIG_SETTING_CONSTRUCTION_TRAFFIC_LIGHTS));
 			{
-				tl->Add(new SettingEntry("construction.traffic_lights"));
-				tl->Add(new SettingEntry("construction.towns_build_traffic_lights"));
-				tl->Add(new SettingEntry("construction.allow_building_tls_in_towns"));
-				tl->Add(new SettingEntry("construction.traffic_lights_green_phase"));
-				tl->Add(new SettingEntry("construction.max_tlc_size"));
-				tl->Add(new SettingEntry("construction.max_tlc_distance"));
+				rs->Add(new SettingEntry("construction.traffic_lights"));
+				rs->Add(new SettingEntry("construction.towns_build_traffic_lights"));
+				rs->Add(new SettingEntry("construction.allow_building_tls_in_towns"));
+				rs->Add(new SettingEntry("construction.traffic_lights_green_phase"));
+				rs->Add(new SettingEntry("construction.max_tlc_size"));
+				rs->Add(new SettingEntry("construction.max_tlc_distance"));
+			}
+
+			SettingsPage* tl = towns->Add(new SettingsPage(STR_CONFIG_SETTING_CONSTRUCTION_ROAD_SIGNS));
+			{
+				tl->Add(new SettingEntry("construction.road_signs"));
+				tl->Add(new SettingEntry("construction.towns_build_road_signs"));
+				tl->Add(new SettingEntry("construction.allow_building_rs_in_towns"));
+				tl->Add(new SettingEntry("construction.allow_eye_candy_road_signs"));
 			}
 
 			SettingsPage* sl = towns->Add(new SettingsPage(STR_CONFIG_SETTING_SPEEDLIMITS));
@@ -1956,6 +1964,7 @@ static SettingsContainer &GetSettingsTree()
 
 			SettingsPage* hw = towns->Add(new SettingsPage(STR_CONFIG_SETTING_HIGHWAYS));
 			{
+				hw->Add(new SettingEntry("vehicle.one_way_roads_out_town_as_highway"));
 				hw->Add(new SettingEntry("vehicle.try_to_use_two_lanes_on_highway"));
 				hw->Add(new SettingEntry("vehicle.min_speed_for_second_lane"));
 				hw->Add(new SettingEntry("vehicle.only_buses_on_second_lane_on_highway"));
