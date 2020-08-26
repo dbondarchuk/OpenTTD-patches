@@ -101,7 +101,7 @@ const SlxiSubChunkInfo _sl_xv_sub_chunk_infos[] = {
 	{ XSLFI_SCHEDULED_DISPATCH,     XSCF_NULL,                2,   2, "scheduled_dispatch",        nullptr, nullptr, nullptr        },
 	{ XSLFI_MORE_TOWN_GROWTH_RATES, XSCF_NULL,                1,   1, "more_town_growth_rates",    nullptr, nullptr, nullptr        },
 	{ XSLFI_MULTIPLE_DOCKS,         XSCF_NULL,                2,   2, "multiple_docks",            nullptr, nullptr, nullptr        },
-	{ XSLFI_TIMETABLE_EXTRA,        XSCF_NULL,                6,   6, "timetable_extra",           nullptr, nullptr, "ORDX"      },
+	{ XSLFI_TIMETABLE_EXTRA,        XSCF_NULL,                7,   7, "timetable_extra",           nullptr, nullptr, "ORDX"      },
 	{ XSLFI_TRAIN_FLAGS_EXTRA,      XSCF_NULL,                1,   1, "train_flags_extra",         nullptr, nullptr, nullptr        },
 	{ XSLFI_TRAIN_THROUGH_LOAD,     XSCF_NULL,                2,   2, "train_through_load",        nullptr, nullptr, nullptr        },
 	{ XSLFI_ORDER_EXTRA_DATA,       XSCF_NULL,                1,   1, "order_extra_data",          nullptr, nullptr, nullptr        },
@@ -124,6 +124,7 @@ const SlxiSubChunkInfo _sl_xv_sub_chunk_infos[] = {
 	{ XSLFI_STATION_GOODS_EXTRA,    XSCF_NULL,                1,   1, "station_goods_extra",       nullptr, nullptr, nullptr        },
 	{ XSLFI_DOCKING_CACHE_VER,      XSCF_IGNORABLE_ALL,       1,   1, "docking_cache_ver",         nullptr, nullptr, nullptr        },
 	{ XSLFI_EXTRA_CHEATS,           XSCF_NULL,                1,   1, "extra_cheats",              nullptr, nullptr, "CHTX"         },
+	{ XSLFI_TOWN_MULTI_BUILDING,    XSCF_NULL,                1,   1, "town_multi_building",       nullptr, nullptr, nullptr        },
 	{ XSLFI_NULL, XSCF_NULL, 0, 0, nullptr, nullptr, nullptr, nullptr },// This is the end marker
 };
 

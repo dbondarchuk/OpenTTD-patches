@@ -3119,6 +3119,7 @@ private:
 		SEL_DC_BASEPLANE = SEL_DC_GOTO_DEPOT, ///< First plane of the #WID_VV_SELECT_DEPOT_CLONE stacked widget.
 		SEL_RT_BASEPLANE = SEL_RT_REFIT,      ///< First plane of the #WID_VV_SELECT_REFIT_TURN stacked widget.
 	};
+	bool mouse_over_start_stop = false;
 
 	/**
 	 * Display a plane in the window.
@@ -3287,6 +3288,7 @@ public:
 
 		const Vehicle *v = Vehicle::Get(this->window_number);
 		StringID str;
+		TextColour text_colour = TC_FROMSTRING;
 		if (v->vehstatus & VS_CRASHED) {
 			str = STR_VEHICLE_STATUS_CRASHED;
 		} else if (v->breakdown_ctr == 1 || (v->type == VEH_TRAIN && Train::From(v)->flags & VRF_IS_BROKEN)) {
@@ -3322,7 +3324,7 @@ public:
 					SetDParam(1, percent);
 				}
 			}
-		} else if (v->vehstatus & VS_STOPPED) {
+		} else if (v->vehstatus & VS_STOPPED && (!mouse_over_start_stop || v->IsStoppedInDepot())) {
 			if (v->type == VEH_TRAIN) {
 				if (v->cur_speed == 0) {
 					if (Train::From(v)->gcache.cached_power == 0) {
@@ -3344,7 +3346,7 @@ public:
 			} else { // no train/RV
 				str = STR_VEHICLE_STATUS_STOPPED;
 			}
-		} else if (v->type == VEH_TRAIN && HasBit(Train::From(v)->flags, VRF_TRAIN_STUCK) && !v->current_order.IsType(OT_LOADING)) {
+		} else if (v->type == VEH_TRAIN && HasBit(Train::From(v)->flags, VRF_TRAIN_STUCK) && !v->current_order.IsType(OT_LOADING) && !mouse_over_start_stop) {
 			str = HasBit(Train::From(v)->flags, VRF_WAITING_RESTRICTION) ? STR_VEHICLE_STATUS_TRAIN_STUCK_WAIT_RESTRICTION : STR_VEHICLE_STATUS_TRAIN_STUCK;
 		} else if (v->type == VEH_TRAIN && Train::From(v)->reverse_distance > 1) {
 			str = STR_VEHICLE_STATUS_TRAIN_REVERSING;
@@ -3352,6 +3354,13 @@ public:
 		} else if (v->type == VEH_AIRCRAFT && HasBit(Aircraft::From(v)->flags, VAF_DEST_TOO_FAR) && !v->current_order.IsType(OT_LOADING)) {
 			str = STR_VEHICLE_STATUS_AIRCRAFT_TOO_FAR;
 		} else { // vehicle is in a "normal" state, show current order
+			if (mouse_over_start_stop) {
+				if (v->vehstatus & VS_STOPPED) {
+					text_colour = TC_RED | TC_FORCED;
+				} else if (v->type == VEH_TRAIN && HasBit(Train::From(v)->flags, VRF_TRAIN_STUCK) && !v->current_order.IsType(OT_LOADING)) {
+					text_colour = TC_ORANGE | TC_FORCED;
+				}
+			}
 			switch (v->current_order.GetType()) {
 				case OT_GOTO_STATION: {
 					SetDParam(0, v->current_order.GetDestination());
@@ -3431,7 +3440,7 @@ public:
 		int image = ((v->vehstatus & VS_STOPPED) != 0) ? SPR_FLAG_VEH_STOPPED : SPR_FLAG_VEH_RUNNING;
 		int lowered = this->IsWidgetLowered(WID_VV_START_STOP) ? 1 : 0;
 		DrawSprite(image, PAL_NONE, image_left + lowered, r.top + WD_IMGBTN_TOP + lowered);
-		DrawString(text_left + lowered, text_right + lowered, r.top + WD_FRAMERECT_TOP + lowered, str, TC_FROMSTRING, SA_HOR_CENTER);
+		DrawString(text_left + lowered, text_right + lowered, r.top + WD_FRAMERECT_TOP + lowered, str, text_colour, SA_HOR_CENTER);
 	}
 
 	void OnClick(Point pt, int widget, int click_count) override
@@ -3582,6 +3591,15 @@ public:
 				uint64 arg = STR_VEHICLE_VIEW_TRAIN_SEND_TO_DEPOT_TOOLTIP + v->type;
 				GuiShowTooltips(this, STR_VEHICLE_VIEW_SEND_TO_DEPOT_TOOLTIP_SHIFT, 1, &arg, TCC_HOVER);
 			}
+		}
+	}
+
+	void OnMouseOver(Point pt, int widget) override
+	{
+		bool start_stop = widget == WID_VV_START_STOP;
+		if (start_stop != mouse_over_start_stop) {
+			mouse_over_start_stop = start_stop;
+			this->SetWidgetDirty(WID_VV_START_STOP);
 		}
 	}
 

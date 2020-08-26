@@ -169,10 +169,14 @@ void Order::MakeLoading(bool ordered)
  * Not that jump_counter is signed and may become
  * negative when a jump has been taken
  *
+ * @param percent the jump chance in %.
+ * @param dry_run whether this is a dry-run, so do not execute side-effects
+ *
  * @return true if the jump should be taken
  */
-bool Order::UpdateJumpCounter(byte percent)
+bool Order::UpdateJumpCounter(byte percent, bool dry_run)
 {
+	if (dry_run) return this->jump_counter >= 0;
 	if (this->jump_counter >= 0) {
 		this->jump_counter += (percent - 100);
 		return true;
@@ -1644,7 +1648,7 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 			break;
 
 		case MOF_CARGO_TYPE_UNLOAD:
-			if (cargo_id >= NUM_CARGO) return CMD_ERROR;
+			if (cargo_id >= NUM_CARGO && cargo_id != CT_INVALID) return CMD_ERROR;
 			if (data == OUFB_CARGO_TYPE_UNLOAD) return CMD_ERROR;
 			/* FALL THROUGH */
 		case MOF_UNLOAD:
@@ -1658,7 +1662,7 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 			break;
 
 		case MOF_CARGO_TYPE_LOAD:
-			if (cargo_id >= NUM_CARGO) return CMD_ERROR;
+			if (cargo_id >= NUM_CARGO && cargo_id != CT_INVALID) return CMD_ERROR;
 			if (data == OLFB_CARGO_TYPE_LOAD || data == OLF_FULL_LOAD_ANY) return CMD_ERROR;
 			/* FALL THROUGH */
 		case MOF_LOAD:
@@ -1787,7 +1791,13 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 				break;
 
 			case MOF_CARGO_TYPE_UNLOAD:
-				order->SetUnloadType((OrderUnloadFlags)data, cargo_id);
+				if (cargo_id == CT_INVALID) {
+					for (CargoID i = 0; i < NUM_CARGO; i++) {
+						order->SetUnloadType((OrderUnloadFlags)data, i);
+					}
+				} else {
+					order->SetUnloadType((OrderUnloadFlags)data, cargo_id);
+				}
 				break;
 
 			case MOF_LOAD:
@@ -1796,7 +1806,13 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 				break;
 
 			case MOF_CARGO_TYPE_LOAD:
-				order->SetLoadType((OrderLoadFlags)data, cargo_id);
+				if (cargo_id == CT_INVALID) {
+					for (CargoID i = 0; i < NUM_CARGO; i++) {
+						order->SetLoadType((OrderLoadFlags)data, i);
+					}
+				} else {
+					order->SetLoadType((OrderLoadFlags)data, cargo_id);
+				}
 				break;
 
 			case MOF_DEPOT_ACTION: {
@@ -1948,11 +1964,23 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 				}
 				switch (mof) {
 					case MOF_CARGO_TYPE_UNLOAD:
-						u->current_order.SetUnloadType((OrderUnloadFlags)data, cargo_id);
+						if (cargo_id == CT_INVALID) {
+							for (CargoID i = 0; i < NUM_CARGO; i++) {
+								u->current_order.SetUnloadType((OrderUnloadFlags)data, i);
+							}
+						} else {
+							u->current_order.SetUnloadType((OrderUnloadFlags)data, cargo_id);
+						}
 						break;
 
 					case MOF_CARGO_TYPE_LOAD:
-						u->current_order.SetLoadType((OrderLoadFlags)data, cargo_id);
+						if (cargo_id == CT_INVALID) {
+							for (CargoID i = 0; i < NUM_CARGO; i++) {
+								u->current_order.SetLoadType((OrderLoadFlags)data, i);
+							}
+						} else {
+							u->current_order.SetLoadType((OrderLoadFlags)data, cargo_id);
+						}
 						break;
 
 					default:
@@ -2469,6 +2497,7 @@ bool Vehicle::HasDepotOrder() const
 void DeleteVehicleOrders(Vehicle *v, bool keep_orderlist, bool reset_order_indices)
 {
 	DeleteOrderWarnings(v);
+	InvalidateWindowClassesData(WC_DEPARTURES_BOARD, 0);
 
 	if (v->IsOrderListShared()) {
 		/* Remove ourself from the shared order list. */
@@ -2476,7 +2505,6 @@ void DeleteVehicleOrders(Vehicle *v, bool keep_orderlist, bool reset_order_indic
 		v->orders.list = nullptr;
 	} else {
 		DeleteWindowById(GetWindowClassForVehicleType(v->type), VehicleListIdentifier(VL_SHARED_ORDERS, v->type, v->owner, v->index).Pack());
-		InvalidateWindowClassesData(WC_DEPARTURES_BOARD, 0);
 		if (v->orders.list != nullptr) {
 			/* Remove the orders */
 			v->orders.list->FreeChain(keep_orderlist);
@@ -2666,7 +2694,7 @@ VehicleOrderID ProcessConditionalOrder(const Order *order, const Vehicle *v, boo
 		case OCV_PERCENT: {
 			/* get a non-const reference to the current order */
 			Order *ord = const_cast<Order *>(order);
-			skip_order = ord->UpdateJumpCounter((byte)value);
+			skip_order = ord->UpdateJumpCounter((byte)value, dry_run);
 			break;
 		}
 		case OCV_REMAINING_LIFETIME: skip_order = OrderConditionCompare(occ, max(v->max_age - v->age + DAYS_IN_LEAP_YEAR - 1, 0) / DAYS_IN_LEAP_YEAR, value); break;

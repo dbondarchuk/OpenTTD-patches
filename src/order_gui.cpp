@@ -117,7 +117,6 @@ private:
 			uint8 order_type = (this->variant == CTOWV_LOAD) ? (uint8) order->GetCargoLoadTypeRaw(cargo_id) : (uint8) order->GetCargoUnloadTypeRaw(cargo_id);
 			this->GetWidget<NWidgetCore>(WID_CTO_CARGO_DROPDOWN_FIRST + i)->SetDataTip(this->cargo_type_order_dropdown[order_type], tooltip);
 		}
-		this->set_to_all_dropdown_sel = 0;
 		this->GetWidget<NWidgetCore>(WID_CTO_SET_TO_ALL_DROPDOWN)->widget_data = this->cargo_type_order_dropdown[this->set_to_all_dropdown_sel];
 	}
 
@@ -159,10 +158,12 @@ public:
 		this->order_id = order_id;
 		this->order_count = v->GetNumOrders();
 		this->order = v->GetOrder(order_id);
+		this->set_to_all_dropdown_sel = 0;
 
 		this->CreateNestedTree(desc);
 		this->GetWidget<NWidgetCore>(WID_CTO_CAPTION)->SetDataTip(STR_CARGO_TYPE_ORDERS_LOAD_CAPTION + this->variant, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS);
 		this->GetWidget<NWidgetCore>(WID_CTO_HEADER)->SetDataTip(STR_CARGO_TYPE_ORDERS_LOAD_TITLE + this->variant, STR_NULL);
+		this->GetWidget<NWidgetStacked>(WID_CTO_SELECT)->SetDisplayedPlane((_sorted_standard_cargo_specs_size >= 32) ? 0 : SZSP_NONE);
 		this->InitDropdownSelectedTypes();
 		this->FinishInitNested(v->index);
 
@@ -239,6 +240,7 @@ public:
 			delete this;
 			return;
 		}
+		ModifyOrderFlags mof = (this->variant == CTOWV_LOAD) ? MOF_CARGO_TYPE_LOAD : MOF_CARGO_TYPE_UNLOAD;
 		if (WID_CTO_CARGO_DROPDOWN_FIRST <= widget && widget <= WID_CTO_CARGO_DROPDOWN_LAST) {
 			const CargoSpec *cs = _sorted_cargo_specs[widget - WID_CTO_CARGO_DROPDOWN_FIRST];
 			const CargoID cargo_id = cs->Index();
@@ -246,14 +248,20 @@ public:
 
 			if (action_type == order_action_type) return;
 
-			ModifyOrderFlags mof = (this->variant == CTOWV_LOAD) ? MOF_CARGO_TYPE_LOAD : MOF_CARGO_TYPE_UNLOAD;
 			DoCommandP(this->vehicle->tile, this->vehicle->index + (this->order_id << 20), mof | (action_type << 4) | (cargo_id << 20), CMD_MODIFY_ORDER | CMD_MSG(STR_ERROR_CAN_T_MODIFY_THIS_ORDER));
 
 			this->GetWidget<NWidgetCore>(widget)->SetDataTip(this->cargo_type_order_dropdown[this->GetOrderActionTypeForCargo(cargo_id)], STR_CARGO_TYPE_LOAD_ORDERS_DROP_TOOLTIP + this->variant);
 			this->SetWidgetDirty(widget);
 		} else if (widget == WID_CTO_SET_TO_ALL_DROPDOWN) {
+			DoCommandP(this->vehicle->tile, this->vehicle->index + (this->order_id << 20), mof | (action_type << 4) | (CT_INVALID << 20), CMD_MODIFY_ORDER | CMD_MSG(STR_ERROR_CAN_T_MODIFY_THIS_ORDER));
+
 			for (int i = 0; i < _sorted_standard_cargo_specs_size; i++) {
-				this->OnDropdownSelect(i + WID_CTO_CARGO_DROPDOWN_FIRST, action_type);
+				const CargoSpec *cs = _sorted_cargo_specs[i];
+				const CargoID cargo_id = cs->Index();
+				if (action_type != this->GetOrderActionTypeForCargo(cargo_id)) {
+					this->GetWidget<NWidgetCore>(i + WID_CTO_CARGO_DROPDOWN_FIRST)->SetDataTip(this->cargo_type_order_dropdown[this->GetOrderActionTypeForCargo(cargo_id)], STR_CARGO_TYPE_LOAD_ORDERS_DROP_TOOLTIP + this->variant);
+					this->SetWidgetDirty(i + WID_CTO_CARGO_DROPDOWN_FIRST);
+				}
 			}
 
 			if (action_type != (int) this->set_to_all_dropdown_sel) {
@@ -317,11 +325,17 @@ public:
  * @return A vertical container of cargo type orders rows.
  * @post \c *biggest_index contains the largest used index in the tree.
  */
-static NWidgetBase *MakeCargoTypeOrdersRows(int *biggest_index)
+static NWidgetBase *MakeCargoTypeOrdersRows(int *biggest_index, bool right)
 {
+
 	NWidgetVertical *ver = new NWidgetVertical;
 
-	for (int i = 0; i < _sorted_standard_cargo_specs_size; i++) {
+	const bool dual_column = (_sorted_standard_cargo_specs_size >= 32);
+	if (right && !dual_column) return ver;
+
+	const int increment = dual_column ? 2 : 1;
+
+	for (int i = (right ? 1 : 0); i < _sorted_standard_cargo_specs_size; i += increment) {
 		/* Cargo row */
 		NWidgetBackground *panel = new NWidgetBackground(WWT_PANEL, COLOUR_GREY, WID_CTO_CARGO_ROW_FIRST + i);
 		ver->Add(panel);
@@ -343,6 +357,16 @@ static NWidgetBase *MakeCargoTypeOrdersRows(int *biggest_index)
 	return ver;
 }
 
+static NWidgetBase *MakeCargoTypeOrdersRowsLeft(int *biggest_index)
+{
+	return MakeCargoTypeOrdersRows(biggest_index, false);
+}
+
+static NWidgetBase *MakeCargoTypeOrdersRowsRight(int *biggest_index)
+{
+	return MakeCargoTypeOrdersRows(biggest_index, true);
+}
+
 /** Widgets definition of CargoTypeOrdersWindow. */
 static const NWidgetPart _nested_cargo_type_orders_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
@@ -352,7 +376,14 @@ static const NWidgetPart _nested_cargo_type_orders_widgets[] = {
 	NWidget(WWT_PANEL, COLOUR_GREY),
 		NWidget(WWT_LABEL, COLOUR_GREY, WID_CTO_HEADER), SetFill(1, 0), SetResize(1, 0), SetDataTip(STR_NULL, STR_NULL),
 	EndContainer(),
-	NWidgetFunction(MakeCargoTypeOrdersRows),
+	NWidget(WWT_PANEL, COLOUR_GREY),
+		NWidget(NWID_HORIZONTAL),
+			NWidgetFunction(MakeCargoTypeOrdersRowsLeft),
+			NWidget(NWID_SELECTION, COLOUR_GREY, WID_CTO_SELECT),
+				NWidgetFunction(MakeCargoTypeOrdersRowsRight),
+			EndContainer(),
+		EndContainer(),
+	EndContainer(),
 	NWidget(WWT_PANEL, COLOUR_GREY), SetMinimalSize(1, 4), SetFill(1, 0), SetResize(1, 0), EndContainer(), // SPACER
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_PANEL, COLOUR_GREY),
@@ -916,20 +947,21 @@ void DrawOrderString(const Vehicle *v, const Order *order, int order_index, int 
 				}
 			} else {
 				OrderConditionComparator occ = order->GetConditionComparator();
-				bool is_cargo = ocv == OCV_CARGO_ACCEPTANCE || ocv == OCV_CARGO_WAITING;
-				SetDParam(0, is_cargo ? STR_ORDER_CONDITIONAL_CARGO : (occ == OCC_IS_TRUE || occ == OCC_IS_FALSE) ? STR_ORDER_CONDITIONAL_TRUE_FALSE : STR_ORDER_CONDITIONAL_NUM);
+				SetDParam(0, (occ == OCC_IS_TRUE || occ == OCC_IS_FALSE) ? STR_ORDER_CONDITIONAL_TRUE_FALSE : STR_ORDER_CONDITIONAL_NUM);
 				SetDParam(2, (ocv == OCV_CARGO_ACCEPTANCE || ocv == OCV_CARGO_WAITING || ocv == OCV_FREE_PLATFORMS)
 						? STR_ORDER_CONDITIONAL_NEXT_STATION : STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE + ocv);
 
 				uint value = order->GetConditionValue();
 				switch (ocv) {
 					case OCV_CARGO_ACCEPTANCE:
-						SetDParam(3, STR_ORDER_CONDITIONAL_COMPARATOR_ACCEPTS + occ - OCC_IS_TRUE);
-						SetDParam(4, CargoSpec::Get( value )->name );
+						SetDParam(0, STR_ORDER_CONDITIONAL_CARGO_ACCEPTANCE);
+						SetDParam(2, STR_ORDER_CONDITIONAL_COMPARATOR_ACCEPTS + occ - OCC_IS_TRUE);
+						SetDParam(3, CargoSpec::Get(value)->name);
 						break;
 					case OCV_CARGO_WAITING:
-						SetDParam(3, STR_ORDER_CONDITIONAL_COMPARATOR_HAS + occ - OCC_IS_TRUE);
-						SetDParam(4, CargoSpec::Get( value )->name );
+						SetDParam(0, STR_ORDER_CONDITIONAL_CARGO_WAITING_DISPLAY);
+						SetDParam(2, STR_ORDER_CONDITIONAL_COMPARATOR_HAS + occ - OCC_IS_TRUE);
+						SetDParam(3, CargoSpec::Get(value)->name);
 						break;
 					case OCV_REQUIRES_SERVICE:
 						SetDParam(3, STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS + occ);
@@ -958,8 +990,8 @@ void DrawOrderString(const Vehicle *v, const Order *order, int order_index, int 
 
 	int edge = DrawString(rtl ? left : middle, rtl ? middle : right, y, STR_ORDER_TEXT, colour);
 
-	if (timetable && timetable_wait_time_valid && order->GetLeaveType() == OLT_LEAVE_EARLY && edge != 0) {
-		edge = DrawString(rtl ? left : edge + 3, rtl ? edge - 3 : right, y, STR_TIMETABLE_LEAVE_EARLY_ORDER, colour);
+	if (timetable && timetable_wait_time_valid && order->GetLeaveType() != OLT_NORMAL && edge != 0) {
+		edge = DrawString(rtl ? left : edge + 3, rtl ? edge - 3 : right, y, STR_TIMETABLE_LEAVE_EARLY_ORDER + order->GetLeaveType() - OLT_LEAVE_EARLY, colour);
 	}
 	if (timetable && HasBit(v->vehicle_flags, VF_SCHEDULED_DISPATCH) && v->GetFirstWaitingLocation(false) == order_index && edge != 0) {
 		StringID str = order->IsWaitTimetabled() ? STR_TIMETABLE_SCHEDULED_DISPATCH_ORDER : STR_TIMETABLE_SCHEDULED_DISPATCH_ORDER_NO_WAIT_TIME;
