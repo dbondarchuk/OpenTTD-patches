@@ -520,6 +520,9 @@ add_files(
     window_func.h
     window_gui.h
     window_type.h
+	roadsigns.h
+	roadsigns_func.h
+	roadsigns.cpp
     zoom_func.h
     zoom_type.h
     zoning.h

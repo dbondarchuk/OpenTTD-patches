@@ -20,6 +20,7 @@
 #include "aystar.h"
 
 #include "../../safeguards.h"
+#include <town.h>
 
 static const uint NPF_HASH_BITS = 12; ///< The size of the hash used in pathfinding. Just changing this value should be sufficient to change the hash size. Should be an even value.
 /* Do no change below values */
@@ -352,16 +353,29 @@ static int32 NPFRoadPathCost(AyStar *as, AyStarNode *current, OpenListNode *pare
 			cost = IsTunnel(tile) ? NPFTunnelCost(current) : NPFBridgeCost(current);
 			break;
 
-		case MP_ROAD:
+		case MP_ROAD: {
 			cost = NPF_TILE_LENGTH;
-			cost = NPF_TILE_LENGTH;
-			/* Increase the cost for two-way roads */
-			if (IsNormalRoadTile(tile) && GetDisallowedRoadDirections(tile) == DRD_NONE) cost += _settings_game.pf.npf.npf_road_two_way_penalty;
+
+			bool isHighway = false;
+
+			if (IsNormalRoadTile(tile)) {
+				if (GetDisallowedRoadDirections(tile) == DRD_NONE) cost += _settings_game.pf.npf.npf_road_two_way_penalty; // extra cost for two way road
+				else {
+					isHighway = IsHighway(tile);
+					if (!isHighway)  cost += _settings_game.pf.npf.npf_road_one_way_penalty; // extra cost for one way road (not highway)
+				}
+			}
+
+			if (!isHighway && IsInTown(tile)) {
+				if (HasTrafficLights(tile)) cost += _settings_game.pf.npf.npf_road_town_penalty; // extra cost for town road
+			}
+
 			/* Increase the cost for level crossings */
 			if (IsLevelCrossing(tile)) cost += _settings_game.pf.npf.npf_crossing_penalty;
 			/* Increase the cost for juctions with trafficlights. */
 			if (HasTrafficLights(tile)) cost += _settings_game.pf.npf.npf_road_trafficlight_penalty;
 			break;
+		}
 
 		case MP_STATION: {
 			cost = NPF_TILE_LENGTH;

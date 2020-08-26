@@ -406,6 +406,11 @@ struct ConstructionSettings {
 	uint8 traffic_lights_green_phase;        ///< How long traffic lights' green phase lasts.
 	uint8 max_tlc_size;                      ///< Maximum size for traffic light consists.
 	uint8 max_tlc_distance;                  ///< Maximum distance between traffic lights for synchronising them.
+
+	bool road_signs;                        ///< Whether road signs are enabled.
+	bool towns_build_road_signs;			///< Whether towns build road signs during road construction.
+	bool allow_building_rs_in_towns;        ///< Whether the players are allowed to build road signs on town owned roads.
+	bool allow_eye_candy_road_signs;		///< Whether auto build of eye candy road signs is enabled
 };
 
 /** Settings related to the AI. */
@@ -453,6 +458,8 @@ struct NPFSettings {
 	
 	uint32 npf_road_trafficlight_penalty;    ///< Penalty for junctions with traffic lights.
 	uint32 npf_road_two_way_penalty;         ///< The penalty for two-way road
+	uint32 npf_road_one_way_penalty;         ///< The penalty for one-way road (not highways)
+	uint32 npf_road_town_penalty;            ///< penalty for town roads (not highways)
 };
 
 /** Settings related to the yet another pathfinder. */
@@ -469,12 +476,15 @@ struct YAPFSettings {
 	uint32 road_stop_penalty;                ///< penalty for going through a drive-through road stop
 	uint32 road_stop_occupied_penalty;       ///< penalty multiplied by the fill percentage of a drive-through road stop
 	uint32 road_stop_bay_occupied_penalty;   ///< penalty multiplied by the fill percentage of a road bay
-	bool   rail_firstred_twoway_eol;         ///< treat first red two-way signal as dead end
-	uint32 rail_firstred_penalty;            ///< penalty for first red signal
-	uint32 rail_firstred_exit_penalty;       ///< penalty for first red exit signal
 
 	uint32 road_trafficlight_penalty;        ///< Penalty for junctions with traffic lights.
 	uint32 road_two_way_penalty;             ///< penalty for two way road
+	uint32 road_one_way_penalty;             ///< The penalty for one-way road (not highways)
+	uint32 road_town_penalty;                ///< penalty for town roads (not highways)
+
+	bool   rail_firstred_twoway_eol;         ///< treat first red two-way signal as dead end
+	uint32 rail_firstred_penalty;            ///< penalty for first red signal
+	uint32 rail_firstred_exit_penalty;       ///< penalty for first red exit signal
 	uint32 rail_lastred_penalty;             ///< penalty for last red signal
 	uint32 rail_lastred_exit_penalty;        ///< penalty for last red exit signal
 	uint32 rail_station_penalty;             ///< penalty for non-target station tile
@@ -581,7 +591,8 @@ struct VehicleSettings {
 	uint16 max_veh_speed_tunnel_bridge;      ///< max speed of vehicle on bridge and in tunnel
 	bool limit_vehicle_speed_highway;        ///< Separate speed limit for highways (one-way roads with an object between) in and out of town
 	uint16 max_veh_speed_highway;				 ///< Speed limit on highways. Zero - no limit
-	bool try_to_use_two_lanes_on_highway;        ///< Cars will try to use two lanes on the highways or one way roads outside of towns
+	bool one_way_roads_out_town_as_highway;        ///< Consider one way roads outside of towns as highways (no object in the middle)
+	bool try_to_use_two_lanes_on_highway;        ///< Cars will try to use two lanes on the highways 
 	uint16 min_speed_for_second_lane;				 ///< Min speed to go to the second lane on highway
 	bool only_buses_on_second_lane_on_highway;        ///< Only buses (any road vehicle with cargo Passengers) will use second lane. Doesn't effect overtaking
 	uint8 chance_of_going_to_second_lane;		///< One in {value} vehicle will go into the second lane on highway

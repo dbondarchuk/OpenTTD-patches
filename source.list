@@ -106,6 +106,7 @@ tile_map.cpp
 tilearea.cpp
 townname.cpp
 trafficlight.cpp
+yieldsign.cpp
 #if WIN32
 #else
 	#if OS2
@@ -433,6 +434,8 @@ water.h
 waypoint_base.h
 waypoint_func.h
 widget_type.h
+yieldsign.h
+yieldsign_func.h
 os/windows/win32.h
 music/win32_m.h
 sound/win32_s.h
