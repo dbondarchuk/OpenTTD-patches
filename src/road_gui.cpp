@@ -363,14 +363,14 @@ struct BuildRoadToolbarWindow : Window {
 			WID_ROT_TRAFFIC_LIGHT,
 			WIDGET_LIST_END);
 		if (!_settings_game.construction.traffic_lights && this->IsWidgetLowered(WID_ROT_TRAFFIC_LIGHT)) ResetObjectToPlace();
-		this->SetWidgetsDisabledState(!_settings_game.construction.traffic_lights,
+		this->SetWidgetsDisabledState(!_settings_game.construction.road_signs,
 			WID_ROT_YIELD_SIGN,
 			WIDGET_LIST_END);
-		if (!_settings_game.construction.traffic_lights && this->IsWidgetLowered(WID_ROT_YIELD_SIGN)) ResetObjectToPlace();
-		this->SetWidgetsDisabledState(!_settings_game.construction.traffic_lights,
+		if (!_settings_game.construction.road_signs && this->IsWidgetLowered(WID_ROT_YIELD_SIGN)) ResetObjectToPlace();
+		this->SetWidgetsDisabledState(!_settings_game.construction.road_signs,
 			WID_ROT_STOP_SIGN,
 			WIDGET_LIST_END);
-		if (!_settings_game.construction.traffic_lights && this->IsWidgetLowered(WID_ROT_STOP_SIGN)) ResetObjectToPlace();
+		if (!_settings_game.construction.road_signs && this->IsWidgetLowered(WID_ROT_STOP_SIGN)) ResetObjectToPlace();
 
 		this->OnInvalidateData();
 		this->last_started_action = WIDGET_LIST_END;
