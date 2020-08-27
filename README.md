@@ -1,4 +1,4 @@
-# dbondarchuk Patchpack version 0.35.1.3
+# dbondarchuk Patchpack version 0.1
 
 This patchpack is based on JGR's patchpack with some additional known packs and few developed by me specifically for my enjoyment.
 
