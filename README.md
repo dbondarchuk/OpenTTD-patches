@@ -11,27 +11,27 @@ My patches:
 
 1. Building objects by large area - if you like to build highways with eye-candy objects, you would like to place those objects by dragging them (instead of clicking at each tile).
 
-2. Bulk removal of signs - if i.e. some AI creates bunch of signs, you can remove them from sign list window (removes all currently filtered signs).
+2. Bulk removal of signs - if i.e. some AI creates a bunch of signs, you can remove them from the sign list window (removes all currently filtered signs).
 
-3. Max locomotive speeds - in case you have a train with 2 (or more) locomotives with different speeds, max speed will be calculated as maximum of speeds of all locomotives, who currently have power.
+3. Max locomotive speeds - in case you have a train with 2 (or more) locomotives with different speeds, max speed will be calculated as the maximum speeds of all locomotives, who currently have power.
 
 4. Increased max station spread.
 
-5. Speed limits - different speed limits for in/out town on one/two way roads. Special speed limit for highways (doesn't metter if is in/out town) - one way road with an object on the left (if right-side driving) or right (if left-side driving), two adjusting by one or two tiles opposite one-way roads
+5. Speed limits - different speed limits for in/out town on one/two-way roads. Special speed limit for highways (doesn't matter if is in/out town) - one-way road with an object on the left (if right-side driving) or right (if left-side driving), two adjusting by one or two tiles opposite one-way roads
 
-6. Usage of the second line - cars will use second lanes on the highways, depending on their speed, probability, breakdown and etc. They will go on the second lane as far as possible. In case if another vehicle with higher speed comes from behind on the second lane too, first vehicle will give the right of way - will temporarly switch to the first lane. They also will do the same in case they are going to breakdown.
+6. Usage of the second line - cars will use second lanes on the highways, depending on their speed, probability, breakdown and etc. They will go on the second lane as far as possible. In case if another vehicle with higher speed comes from behind on the second lane too, the first vehicle will give the right of way - will temporarily switch to the first lane. They also will do the same in case they are going to breakdown.
 
 7. Road signs
 
-   1. Yield sign (only on 3-way road intersection) - will make vehicle to check for the traffic coming towards the intersection.
+   1. Yield sign (only on 3-way road intersection) - will make the vehicle check for the traffic coming towards the intersection.
 
-   2. Stop sign (all-way) - vehicle will stop on interaction and wait until interaction is clear.
+   2. Stop sign (all-way) - the vehicle will stop on interaction and wait until the intersection is clear.
 
    3. Street directions - will be placed automatically on the street interactions inside city limits. Eye-candy.
 
    4. Fire hydrant - will be placed automatically on the town straight roads with 1/3 probability. Eye-candy.
 
-8. Town limits zoning - allows to see where town limits are (different from the authority).
+8. Town limits zoning - allows us to see where town limits are (different from the authority).
 
 ## JGR's Patchpack version 0.35.1
 
