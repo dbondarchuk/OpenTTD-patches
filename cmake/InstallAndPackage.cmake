@@ -35,7 +35,7 @@ install(FILES
                 ${CMAKE_SOURCE_DIR}/docs/multiplayer.md
                 ${CMAKE_SOURCE_DIR}/known-bugs.txt
                 ${CMAKE_SOURCE_DIR}/jgrpp-changelog.md
-                ${CMAKE_SOURCE_DIR}/dbondarchuk-changelog.md
+                ${CMAKE_SOURCE_DIR}/dbpp-changelog.md
         DESTINATION ${DOCS_DESTINATION_DIR}
         COMPONENT docs)
 

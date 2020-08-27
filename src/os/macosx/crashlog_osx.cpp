@@ -429,7 +429,7 @@ public:
 		seprintf(message, lastof(message),
 				 "Please send the generated crash information and the last (auto)save to the patchpack developer. "
 				 "This will greatly help debugging. The correct place to do this is https://www.tt-forums.net/viewtopic.php?f=33&t=73469"
-				 " or https://github.com/JGRennison/OpenTTD-patches\n\n"
+				 " or https://github.com/dbondarchuk/OpenTTD-patches\n\n"
 				 "Generated file(s):\n%s\n%s\n%s",
 				 this->filename_log, this->filename_save, this->filename_screenshot);
 

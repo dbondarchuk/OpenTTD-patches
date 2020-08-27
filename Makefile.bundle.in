@@ -80,7 +80,7 @@ endif
 	$(Q)cp "$(ROOT_DIR)/docs/multiplayer.md"  "$(BUNDLE_DIR)/docs/"
 	$(Q)cp "$(ROOT_DIR)/changelog.txt"        "$(BUNDLE_DIR)/"
 	$(Q)cp "$(ROOT_DIR)/jgrpp-changelog.md"   "$(BUNDLE_DIR)/"
-	$(Q)cp "$(ROOT_DIR)/dbondarchuk-changelog.md"   "$(BUNDLE_DIR)/"
+	$(Q)cp "$(ROOT_DIR)/dbpp-changelog.md"   "$(BUNDLE_DIR)/"
 ifdef MAN_DIR
 	$(Q)mkdir -p "$(BUNDLE_DIR)/man/"
 	$(Q)cp "$(ROOT_DIR)/docs/openttd.6"       "$(BUNDLE_DIR)/man/"
@@ -197,7 +197,7 @@ ifndef DO_NOT_INSTALL_CHANGELOG
 	$(Q)install -d "$(INSTALL_DOC_DIR)"
 	$(Q)install -m 644 "$(BUNDLE_DIR)/changelog.txt" "$(INSTALL_DOC_DIR)"
 	$(Q)install -m 644 "$(BUNDLE_DIR)/jgrpp-changelog.md" "$(INSTALL_DOC_DIR)"
-	$(Q)install -m 644 "$(BUNDLE_DIR)/dbondarchuk-changelog.md" "$(INSTALL_DOC_DIR)"
+	$(Q)install -m 644 "$(BUNDLE_DIR)/dbpp-changelog.md" "$(INSTALL_DOC_DIR)"
 endif
 ifndef DO_NOT_INSTALL_LICENSE
 	$(Q)install -d "$(INSTALL_DOC_DIR)"
