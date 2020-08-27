@@ -35,7 +35,7 @@ bool IsReleasedVersion()
  *
  * <modified> shows a "M", if the binary is made from modified source code.
  */
-const char _openttd_revision[] = "20200710-Branch_jgrpp-34-gbd4b0baddc";
+const char _openttd_revision[] = "2020827-Branch_dbondarchuk-1-gbd4b0baddc";
 
 /**
  * The text version of OpenTTD's build date.
