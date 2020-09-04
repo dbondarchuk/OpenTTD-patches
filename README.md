@@ -1,4 +1,4 @@
-# dbondarchuk Patchpack version 0.1
+# dbondarchuk Patchpack version 0.2
 
 This patchpack is based on JGR's patchpack with some additional known packs and few developed by me specifically for my enjoyment.
 
@@ -32,6 +32,10 @@ My patches:
    4. Fire hydrant - will be placed automatically on the town straight roads with 1/3 probability. Eye-candy.
 
 8. Town limits zoning - allows us to see where town limits are (different from the authority).
+
+9. APIs for AIs to work with infrastucture sharing, different road types, buying/selling shares
+
+10. Console command to sell all vehicles with specific station in orders. This maybe helpful for the situations when planes are stuck in airport and don't want to move at all.
 
 ## JGR's Patchpack version 0.35.1
 

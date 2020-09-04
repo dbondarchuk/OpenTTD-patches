@@ -341,6 +341,15 @@
 	return ScriptObject::DoCommand(0, companyID, 0, CMD_BUY_SHARE_IN_COMPANY);
 }
 
+/* static */ bool ScriptCompany::SellShareInCompany(ScriptCompany::CompanyID companyID) {
+	EnforcePrecondition(false, ScriptObject::GetCompany() == OWNER_DEITY);
+
+	companyID = ResolveCompanyID(companyID);
+	if (companyID == COMPANY_INVALID) return false;
+
+	return ScriptObject::DoCommand(0, companyID, 0, CMD_SELL_SHARE_IN_COMPANY);
+}
+
 /* static */ byte ScriptCompany::GetCompanyShare(ScriptCompany::CompanyID ownerCompanyID, ScriptCompany::CompanyID inCompanyID) {
 
 	ownerCompanyID = ResolveCompanyID(ownerCompanyID);

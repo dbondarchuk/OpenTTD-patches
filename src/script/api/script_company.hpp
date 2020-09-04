@@ -426,6 +426,13 @@ public:
 	bool ScriptCompany::BuyShareInCompany(ScriptCompany::CompanyID companyID);
 
 	/**
+	 * Sells share in other company
+	 * @param companyID ID of the company to sell shares
+	 * @return If sell was successful
+	*/
+	bool ScriptCompany::SellShareInCompany(ScriptCompany::CompanyID companyID);
+
+	/**
 	 * Gets number of quarters of one's company share in another company
 	 * @param ownerCompanyID ID of the company to check who owns share
 	 * @param inCompanyID ID of the company to check shares status
