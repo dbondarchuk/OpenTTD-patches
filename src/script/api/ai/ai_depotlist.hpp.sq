@@ -19,5 +19,8 @@ void SQAIDepotList_Register(Squirrel *engine)
 	SQAIDepotList.PreRegister(engine, "AIList");
 	SQAIDepotList.AddConstructor<void (ScriptDepotList::*)(ScriptTile::TransportType transport_type), 2>(engine, "xi");
 
+	SQAIDepotList.DefSQStaticMethod(engine, &ScriptDepotList::GetAllDepots,                 "GetAllDepots",                 2, ".i");
+	SQAIDepotList.DefSQStaticMethod(engine, &ScriptDepotList::CanBuiltInDepot,                 "CanBuiltInDepot",                 2, ".i");
+
 	SQAIDepotList.PostRegister(engine);
 }

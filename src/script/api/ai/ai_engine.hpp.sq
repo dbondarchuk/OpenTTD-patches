@@ -42,6 +42,7 @@ void SQAIEngine_Register(Squirrel *engine)
 	SQAIEngine.DefSQStaticMethod(engine, &ScriptEngine::CanRunOnRoad,            "CanRunOnRoad",            3, ".ii");
 	SQAIEngine.DefSQStaticMethod(engine, &ScriptEngine::HasPowerOnRoad,          "HasPowerOnRoad",          3, ".ii");
 	SQAIEngine.DefSQStaticMethod(engine, &ScriptEngine::GetRoadType,             "GetRoadType",             2, ".i");
+	SQAIEngine.DefSQStaticMethod(engine, &ScriptEngine::GetRoadTramType,         "GetRoadTramType",         2, ".i");
 	SQAIEngine.DefSQStaticMethod(engine, &ScriptEngine::GetRailType,             "GetRailType",             2, ".i");
 	SQAIEngine.DefSQStaticMethod(engine, &ScriptEngine::IsArticulated,           "IsArticulated",           2, ".i");
 	SQAIEngine.DefSQStaticMethod(engine, &ScriptEngine::GetPlaneType,            "GetPlaneType",            2, ".i");

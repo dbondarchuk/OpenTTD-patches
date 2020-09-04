@@ -247,6 +247,15 @@ public:
 	static ScriptRoad::RoadType GetRoadType(EngineID engine_id);
 
 	/**
+	 * Get the RoadTramType of the engine.
+	 * @param engine_id The engine to get the RoadType of.
+	 * @pre IsValidEngine(engine_id).
+	 * @pre GetVehicleType(engine_id) == ScriptVehicle::VT_ROAD.
+	 * @return The RoadTramType the engine has.
+	 */
+	static ScriptRoad::RoadTramTypes GetRoadTramType(EngineID engine_id);
+
+	/**
 	 * Get the RailType of the engine.
 	 * @param engine_id The engine to get the RailType of.
 	 * @pre IsValidEngine(engine_id).

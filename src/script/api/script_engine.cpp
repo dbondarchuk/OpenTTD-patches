@@ -240,6 +240,14 @@
 	return (ScriptRoad::RoadType)(uint)::RoadVehInfo(engine_id)->roadtype;
 }
 
+/* static */ ScriptRoad::RoadTramTypes ScriptEngine::GetRoadTramType(EngineID engine_id)
+{
+	if (!IsValidEngine(engine_id)) return ScriptRoad::ROADTRAMTYPES_INVALID;
+	if (GetVehicleType(engine_id) != ScriptVehicle::VT_ROAD) return ScriptRoad::ROADTRAMTYPES_INVALID;
+
+	return RoadTypeIsTram(::RoadVehInfo(engine_id)->roadtype) ? ScriptRoad::ROADTRAMTYPES_TRAM : ScriptRoad::ROADTRAMTYPES_ROAD;
+}
+
 /* static */ ScriptRail::RailType ScriptEngine::GetRailType(EngineID engine_id)
 {
 	if (!IsValidEngine(engine_id)) return ScriptRail::RAILTYPE_INVALID;

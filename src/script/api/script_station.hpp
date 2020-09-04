@@ -5,7 +5,7 @@
  * See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with OpenTTD. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file script_station.hpp Everything to query and build stations. */
+ /** @file script_station.hpp Everything to query and build stations. */
 
 #ifndef SCRIPT_STATION_HPP
 #define SCRIPT_STATION_HPP
@@ -42,13 +42,31 @@ public:
 	 */
 	enum StationType {
 		/* Note: these values represent part of the in-game StationFacility enum */
-		STATION_TRAIN      = (int)::FACIL_TRAIN,      ///< Train station
+		STATION_TRAIN = (int)::FACIL_TRAIN,      ///< Train station
 		STATION_TRUCK_STOP = (int)::FACIL_TRUCK_STOP, ///< Truck station
-		STATION_BUS_STOP   = (int)::FACIL_BUS_STOP,   ///< Bus station
-		STATION_AIRPORT    = (int)::FACIL_AIRPORT,    ///< Airport
-		STATION_DOCK       = (int)::FACIL_DOCK,       ///< Dock
-		STATION_ANY        = STATION_TRAIN | STATION_TRUCK_STOP | STATION_BUS_STOP | STATION_AIRPORT | STATION_DOCK, ///< All station types
+		STATION_BUS_STOP = (int)::FACIL_BUS_STOP,   ///< Bus station
+		STATION_AIRPORT = (int)::FACIL_AIRPORT,    ///< Airport
+		STATION_DOCK = (int)::FACIL_DOCK,       ///< Dock
+		STATION_ANY = STATION_TRAIN | STATION_TRUCK_STOP | STATION_BUS_STOP | STATION_AIRPORT | STATION_DOCK, ///< All station types
 	};
+
+	static inline int StationTypeToInfrastuctureSetting(StationType s) {
+		switch (s)
+		{
+			case ScriptStation::STATION_TRAIN:
+				return 0;
+			case ScriptStation::STATION_TRUCK_STOP:
+			case ScriptStation::STATION_BUS_STOP:
+				return 1;
+			case ScriptStation::STATION_AIRPORT:
+				return 3;
+			case ScriptStation::STATION_DOCK:
+				return 2;
+			case ScriptStation::STATION_ANY:
+			default:
+				return -1;
+		}
+	}
 
 	/**
 	 * Checks whether the given station is valid and owned by you.
@@ -296,15 +314,15 @@ public:
 private:
 	template<bool Tfrom, bool Tvia>
 	static bool IsCargoRequestValid(StationID station_id, StationID from_station_id,
-			StationID via_station_id, CargoID cargo_id);
+		StationID via_station_id, CargoID cargo_id);
 
 	template<bool Tfrom, bool Tvia>
 	static int32 CountCargoWaiting(StationID station_id, StationID from_station_id,
-			StationID via_station_id, CargoID cargo_id);
+		StationID via_station_id, CargoID cargo_id);
 
 	template<bool Tfrom, bool Tvia>
 	static int32 CountCargoPlanned(StationID station_id, StationID from_station_id,
-			StationID via_station_id, CargoID cargo_id);
+		StationID via_station_id, CargoID cargo_id);
 
 };
 

@@ -30,6 +30,7 @@ void SQAIVehicleList_Station_Register(Squirrel *engine)
 	DefSQClass<ScriptVehicleList_Station, ST_AI> SQAIVehicleList_Station("AIVehicleList_Station");
 	SQAIVehicleList_Station.PreRegister(engine, "AIList");
 	SQAIVehicleList_Station.AddConstructor<void (ScriptVehicleList_Station::*)(StationID station_id), 2>(engine, "xi");
+	SQAIVehicleList_Station.DefSQStaticMethod(engine, &ScriptVehicleList_Station::GetAllVehicles,                 "GetAllVehicles",                 2, ".i");
 
 	SQAIVehicleList_Station.PostRegister(engine);
 }

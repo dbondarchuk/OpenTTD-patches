@@ -19,6 +19,8 @@ void SQAIWaypointList_Register(Squirrel *engine)
 	SQAIWaypointList.PreRegister(engine, "AIList");
 	SQAIWaypointList.AddConstructor<void (ScriptWaypointList::*)(ScriptWaypoint::WaypointType waypoint_type), 2>(engine, "xi");
 
+	SQAIWaypointList.DefSQStaticMethod(engine, &ScriptWaypointList::GetAllWaypoints,                 "GetAllWaypoints",                 2, ".i");
+
 	SQAIWaypointList.PostRegister(engine);
 }
 

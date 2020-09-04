@@ -37,12 +37,15 @@ void SQAIAirport_Register(Squirrel *engine)
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::IsValidAirportType,            "IsValidAirportType",            2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::IsAirportInformationAvailable, "IsAirportInformationAvailable", 2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::GetPrice,                      "GetPrice",                      2, ".i");
+	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::HasShortStrip,                 "HasShortStrip",                 2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::IsHangarTile,                  "IsHangarTile",                  2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::IsAirportTile,                 "IsAirportTile",                 2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::GetAirportWidth,               "GetAirportWidth",               2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::GetAirportHeight,              "GetAirportHeight",              2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::GetAirportCoverageRadius,      "GetAirportCoverageRadius",      2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::GetNumHangars,                 "GetNumHangars",                 2, ".i");
+	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::GetNumTerminals,               "GetNumTerminals",                 2, ".i");
+	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::GetNumHelipads,               "GetNumHelipads",                 2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::GetHangarOfAirport,            "GetHangarOfAirport",            2, ".i");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::BuildAirport,                  "BuildAirport",                  4, ".iii");
 	SQAIAirport.DefSQStaticMethod(engine, &ScriptAirport::RemoveAirport,                 "RemoveAirport",                 2, ".i");

@@ -123,6 +123,22 @@ public:
 	static int32 GetNumHangars(TileIndex tile);
 
 	/**
+	 * Get the number of terminals of the airport.
+	 * @param tile Any tile of the airport.
+	 * @pre ScriptMap::IsValidTile(tile).
+	 * @return The number of terminals of the airport.
+	 */
+	static int32 GetNumTerminals(TileIndex tile);
+
+	/**
+	 * Get the number of helipads of the airport.
+	 * @param tile Any tile of the airport.
+	 * @pre ScriptMap::IsValidTile(tile).
+	 * @return The number of helipads of the airport.
+	 */
+	static int32 GetNumHelipads(TileIndex tile);
+
+	/**
 	 * Get the first hangar tile of the airport.
 	 * @param tile Any tile of the airport.
 	 * @pre ScriptMap::IsValidTile(tile).
@@ -207,6 +223,15 @@ public:
 	 * @return Monthly maintenance cost of the airport type.
 	 */
 	static Money GetMonthlyMaintenanceCost(AirportType type);
+
+	/**
+	 * Checks if airport has short strip.
+	 * @param tile Any tile of the airport.
+	 * @pre ScriptTile::IsStationTile(tile).
+	 * @pre ScriptStation::HasStationType(ScriptStation.GetStationID(tile), ScriptStation::STATION_AIRPORT).
+	 * @return If airport has short strip.
+	 */
+	static bool HasShortStrip(TileIndex tile);
 };
 
 #endif /* SCRIPT_AIRPORT_HPP */

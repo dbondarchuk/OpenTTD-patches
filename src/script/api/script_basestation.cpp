@@ -20,7 +20,7 @@
 /* static */ bool ScriptBaseStation::IsValidBaseStation(StationID station_id)
 {
 	const BaseStation *st = ::BaseStation::GetIfValid(station_id);
-	return st != nullptr && (st->owner == ScriptObject::GetCompany() || ScriptObject::GetCompany() == OWNER_DEITY || st->owner == OWNER_NONE);
+	return st != nullptr /*&& (st->owner == ScriptObject::GetCompany() || ScriptObject::GetCompany() == OWNER_DEITY || st->owner == OWNER_NONE)*/;
 }
 
 /* static */ char *ScriptBaseStation::GetName(StationID station_id)

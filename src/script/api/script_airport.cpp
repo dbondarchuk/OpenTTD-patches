@@ -11,6 +11,7 @@
 #include "script_airport.hpp"
 #include "script_station.hpp"
 #include "../../station_base.h"
+#include "../../company_base.h"
 #include "../../town.h"
 
 #include "../../safeguards.h"
@@ -95,10 +96,47 @@
 	if (!::IsTileType(tile, MP_STATION)) return -1;
 
 	const Station *st = ::Station::GetByTile(tile);
-	if (st->owner != ScriptObject::GetCompany() && ScriptObject::GetCompany() != OWNER_DEITY) return -1;
+	const Company* ownerCompany = ::Company::Get(st->owner);
+	if ((st->owner != ScriptObject::GetCompany() && ScriptObject::GetCompany() != OWNER_DEITY)
+		&& !(_settings_game.economy.infrastructure_sharing[VEH_AIRCRAFT]
+			&& ownerCompany->settings.infra_others_buy_in_depot[VEH_AIRCRAFT])) return -1;
 	if ((st->facilities & FACIL_AIRPORT) == 0) return -1;
 
 	return st->airport.GetNumHangars();
+}
+
+/* static */ int32 ScriptAirport::GetNumTerminals(TileIndex tile)
+{
+	if (!::IsValidTile(tile)) return -1;
+	if (!::IsTileType(tile, MP_STATION)) return -1;
+
+	const Station* st = ::Station::GetByTile(tile);
+	const Company* ownerCompany = ::Company::Get(st->owner);
+	if ((st->owner != ScriptObject::GetCompany() && ScriptObject::GetCompany() != OWNER_DEITY)
+		&& !(_settings_game.economy.infrastructure_sharing[VEH_AIRCRAFT]
+			&& ownerCompany->settings.infra_others_buy_in_depot[VEH_AIRCRAFT])) return -1;
+	if ((st->facilities & FACIL_AIRPORT) == 0) return -1;
+
+	uint num = 0;
+
+	for (uint i = st->airport.GetFTA()->terminals[0]; i > 0; i--) num += st->airport.GetFTA()->terminals[i];
+
+	return num;
+}
+
+/* static */ int32 ScriptAirport::GetNumHelipads(TileIndex tile)
+{
+	if (!::IsValidTile(tile)) return -1;
+	if (!::IsTileType(tile, MP_STATION)) return -1;
+
+	const Station* st = ::Station::GetByTile(tile);
+	const Company* ownerCompany = ::Company::Get(st->owner);
+	if ((st->owner != ScriptObject::GetCompany() && ScriptObject::GetCompany() != OWNER_DEITY)
+		&& !(_settings_game.economy.infrastructure_sharing[VEH_AIRCRAFT]
+			&& ownerCompany->settings.infra_others_buy_in_depot[VEH_AIRCRAFT])) return -1;
+	if ((st->facilities & FACIL_AIRPORT) == 0) return -1;
+
+	return st->airport.GetFTA()->num_helipads;
 }
 
 /* static */ TileIndex ScriptAirport::GetHangarOfAirport(TileIndex tile)
@@ -108,7 +146,10 @@
 	if (GetNumHangars(tile) < 1) return INVALID_TILE;
 
 	const Station *st = ::Station::GetByTile(tile);
-	if (st->owner != ScriptObject::GetCompany() && ScriptObject::GetCompany() != OWNER_DEITY) return INVALID_TILE;
+	const Company *ownerCompany = ::Company::Get(st->owner);
+	if ((st->owner != ScriptObject::GetCompany() && ScriptObject::GetCompany() != OWNER_DEITY)
+		&& !(_settings_game.economy.infrastructure_sharing[VEH_AIRCRAFT]
+			&& ownerCompany->settings.infra_others_buy_in_depot[VEH_AIRCRAFT])) return INVALID_TILE;
 	if ((st->facilities & FACIL_AIRPORT) == 0) return INVALID_TILE;
 
 	return st->airport.GetHangarTile(0);
@@ -173,4 +214,14 @@
 	if (!IsAirportInformationAvailable(type)) return -1;
 
 	return (int64)GetMaintenanceCostFactor(type) * _price[PR_INFRASTRUCTURE_AIRPORT] >> 3;
+}
+
+/* static */ bool ScriptAirport::HasShortStrip(TileIndex tile) {
+	if (!ScriptTile::IsStationTile(tile)) return AT_INVALID;
+
+	StationID station_id = ::GetStationIndex(tile);
+
+	if (!ScriptStation::HasStationType(station_id, ScriptStation::STATION_AIRPORT)) return AT_INVALID;
+
+	return (::Station::Get(station_id)->airport.GetFTA()->flags) & AirportFTAClass::SHORT_STRIP;
 }

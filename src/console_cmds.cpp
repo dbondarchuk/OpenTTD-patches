@@ -51,6 +51,7 @@
 #include <time.h>
 
 #include "safeguards.h"
+#include "infrastructure_func.h"
 
 /* scriptfile handling */
 static bool _script_running; ///< Script is running (used to abort execution when #ConReturn is encountered).
@@ -1721,6 +1722,31 @@ DEF_CONSOLE_CMD(ConSayCompany)
 	return true;
 }
 
+DEF_CONSOLE_CMD(ConSellVehicles)
+{
+	if (argc == 0) {
+		IConsoleHelp("Sells all vehicles that have specified station in orders. Usage: sell_vehicles <station-index>");
+		return true;
+	}
+
+	if (argc != 2) return false;
+
+	for (Vehicle* veh : Vehicle::Iterate()) {
+		for (const OrderList* orderList : veh->orders.list->Iterate()) {
+			const Order* order = veh->GetFirstOrder();
+			while (order != nullptr) {
+				if (order->GetDestination() == atoi(argv[1]) && order->GetType() == OT_GOTO_STATION) {
+					RemoveAndSellVehicle(veh, true);
+				}
+
+				order = order->next;
+			}
+		}
+	}
+
+	return true;
+}
+
 DEF_CONSOLE_CMD(ConSayClient)
 {
 	if (argc == 0) {
@@ -2593,6 +2619,8 @@ void IConsoleStdLibRegister()
 
 	IConsoleCmdRegister("companies",       ConCompanies);
 	IConsoleAliasRegister("players",       "companies");
+	IConsoleCmdRegister("sell_vehicles", ConSellVehicles);
+
 
 	/* networking functions */
 

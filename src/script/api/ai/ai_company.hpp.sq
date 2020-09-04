@@ -102,6 +102,9 @@ void SQAICompany_Register(Squirrel *engine)
 	SQAICompany.DefSQStaticMethod(engine, &ScriptCompany::SetSecondaryLiveryColour,      "SetSecondaryLiveryColour",      3, ".ii");
 	SQAICompany.DefSQStaticMethod(engine, &ScriptCompany::GetPrimaryLiveryColour,        "GetPrimaryLiveryColour",        2, ".i");
 	SQAICompany.DefSQStaticMethod(engine, &ScriptCompany::GetSecondaryLiveryColour,      "GetSecondaryLiveryColour",      2, ".i");
+	SQAICompany.DefSQStaticMethod(engine, &ScriptCompany::GetCompanyValue,      "GetCompanyValue",      2, ".i");
+	SQAICompany.DefSQStaticMethod(engine, &ScriptCompany::BuyShareInCompany,      "BuyShareInCompany",      2, ".i");
+	SQAICompany.DefSQStaticMethod(engine, &ScriptCompany::GetCompanyShare,      "GetCompanyShare",      3, ".i");
 
 	SQAICompany.PostRegister(engine);
 }

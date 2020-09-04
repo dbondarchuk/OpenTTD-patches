@@ -31,6 +31,7 @@ void SQAIRoad_Register(Squirrel *engine)
 	SQAIRoad.DefSQConst(engine, ScriptRoad::ROADTYPE_INVALID,                             "ROADTYPE_INVALID");
 	SQAIRoad.DefSQConst(engine, ScriptRoad::ROADTRAMTYPES_ROAD,                           "ROADTRAMTYPES_ROAD");
 	SQAIRoad.DefSQConst(engine, ScriptRoad::ROADTRAMTYPES_TRAM,                           "ROADTRAMTYPES_TRAM");
+	SQAIRoad.DefSQConst(engine, ScriptRoad::ROADTRAMTYPES_INVALID,                        "ROADTRAMTYPES_INVALID");
 	SQAIRoad.DefSQConst(engine, ScriptRoad::ROADVEHTYPE_BUS,                              "ROADVEHTYPE_BUS");
 	SQAIRoad.DefSQConst(engine, ScriptRoad::ROADVEHTYPE_TRUCK,                            "ROADVEHTYPE_TRUCK");
 	SQAIRoad.DefSQConst(engine, ScriptRoad::BT_ROAD,                                      "BT_ROAD");
@@ -56,10 +57,18 @@ void SQAIRoad_Register(Squirrel *engine)
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::GetName,                        "GetName",                        2, ".i");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::GetRoadVehicleTypeForCargo,     "GetRoadVehicleTypeForCargo",     2, ".i");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsRoadTile,                     "IsRoadTile",                     2, ".i");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsRoadTileOfType,                     "IsRoadTileOfType",                     3, ".i");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsRoadDepotTile,                "IsRoadDepotTile",                2, ".i");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsRoadDepotTileOfType,                "IsRoadDepotTileOfType",                3, ".i");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsRoadStationTile,              "IsRoadStationTile",              2, ".i");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsRoadStationTileOfType,              "IsRoadStationTileOfType",              3, ".i");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsRoadStationTileOfVehicleType,              "IsRoadStationTileOfVehicleType",              4, ".i");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsDriveThroughRoadStationTile,  "IsDriveThroughRoadStationTile",  2, ".i");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsDriveThroughRoadStationTileOfType,  "IsDriveThroughRoadStationTileOfType",  3, ".i");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsDriveThroughRoadStationTileOfVehicleType,  "IsDriveThroughRoadStationTileOfVehicleType",  4, ".i");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::IsRoadTypeAvailable,            "IsRoadTypeAvailable",            2, ".i");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::HasAnyRoadTypeRoad,             "HasAnyRoadTypeRoad",             2, ".i");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::HasAnyRoadTypeTram,             "HasAnyRoadTypeTram",             2, ".i");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::GetCurrentRoadType,             "GetCurrentRoadType",             1, ".");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::SetCurrentRoadType,             "SetCurrentRoadType",             2, ".i");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::RoadVehCanRunOnRoad,            "RoadVehCanRunOnRoad",            3, ".ii");
@@ -67,6 +76,7 @@ void SQAIRoad_Register(Squirrel *engine)
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::ConvertRoadType,                "ConvertRoadType",                4, ".iii");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::HasRoadType,                    "HasRoadType",                    3, ".ii");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::AreRoadTilesConnected,          "AreRoadTilesConnected",          3, ".ii");
+	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::AreRoadTilesConnectedByRoadTramType,          "AreRoadTilesConnectedByRoadTramType",          4, ".ii");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::CanBuildConnectedRoadParts,     "CanBuildConnectedRoadParts",     5, ".iaii");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::CanBuildConnectedRoadPartsHere, "CanBuildConnectedRoadPartsHere", 4, ".iii");
 	SQAIRoad.DefSQStaticMethod(engine, &ScriptRoad::GetNeighbourRoadCount,          "GetNeighbourRoadCount",          2, ".i");

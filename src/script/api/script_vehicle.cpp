@@ -27,7 +27,7 @@
 /* static */ bool ScriptVehicle::IsValidVehicle(VehicleID vehicle_id)
 {
 	const Vehicle *v = ::Vehicle::GetIfValid(vehicle_id);
-	return v != nullptr && (v->owner == ScriptObject::GetCompany() || ScriptObject::GetCompany() == OWNER_DEITY) && (v->IsPrimaryVehicle() || (v->type == VEH_TRAIN && ::Train::From(v)->IsFreeWagon()));
+	return v != nullptr /*&& (v->owner == ScriptObject::GetCompany() || ScriptObject::GetCompany() == OWNER_DEITY)*/ && (v->IsPrimaryVehicle() || (v->type == VEH_TRAIN && ::Train::From(v)->IsFreeWagon()));
 }
 
 /* static */ ScriptCompany::CompanyID ScriptVehicle::GetOwner(VehicleID vehicle_id)

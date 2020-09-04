@@ -19,6 +19,8 @@ void SQAIStationList_Register(Squirrel *engine)
 	SQAIStationList.PreRegister(engine, "AIList");
 	SQAIStationList.AddConstructor<void (ScriptStationList::*)(ScriptStation::StationType station_type), 2>(engine, "xi");
 
+	SQAIStationList.DefSQStaticMethod(engine, &ScriptStationList::GetAllStations,                 "GetAllStations",                 2, ".i");
+
 	SQAIStationList.PostRegister(engine);
 }
 
