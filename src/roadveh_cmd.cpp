@@ -537,7 +537,7 @@ void RoadVehicle::MarkDirty()
 {
 	for (RoadVehicle* v = this; v != nullptr; v = v->Next()) {
 		v->colourmap = PAL_NONE;
-		v->cur_image_valid_dir = INVALID_DIR;
+		v->InvalidateImageCache();
 		v->UpdateViewport(true, false);
 	}
 	this->CargoChanged();
@@ -1266,7 +1266,7 @@ static bool RoadVehLeaveDepot(RoadVehicle* v, bool first)
 	}
 
 	v->vehstatus &= ~VS_HIDDEN;
-	v->cur_image_valid_dir = INVALID_DIR;
+	v->InvalidateImageCache();
 	v->state = tdir;
 	v->frame = RVC_DEPOT_START_FRAME;
 	v->UpdateIsDrawn();
@@ -1619,7 +1619,7 @@ bool IndividualRoadVehicleController(RoadVehicle* v, const RoadVehicle* prev)
 		}
 
 		if (!HasBit(r, VETS_ENTERED_WORMHOLE)) {
-			v->cur_image_valid_dir = INVALID_DIR;
+			v->InvalidateImageCache();
 			TileIndex old_tile = v->tile;
 			v->prev_tile = v->tile;
 			v->tile = tile;
@@ -1698,7 +1698,7 @@ bool IndividualRoadVehicleController(RoadVehicle* v, const RoadVehicle* prev)
 			return false;
 		}
 
-		v->cur_image_valid_dir = INVALID_DIR;
+		v->InvalidateImageCache();
 		v->state = dir;
 		v->frame = turn_around_start_frame;
 

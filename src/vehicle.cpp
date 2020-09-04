@@ -340,6 +340,7 @@ uint Vehicle::Crash(bool flooded)
 		if (IsCargoInClass(v->cargo_type, CC_PASSENGERS)) pass += v->cargo.TotalCount();
 		v->vehstatus |= VS_CRASHED;
 		v->MarkAllViewportsDirty();
+		v->InvalidateImageCache();
 	}
 
 	this->ClearSeparation();
@@ -1594,7 +1595,7 @@ void ViewportAddVehicles(DrawPixelInfo *dpi)
 	}
 }
 
-void ViewportMapDrawVehicles(DrawPixelInfo *dpi, ViewPort *vp)
+void ViewportMapDrawVehicles(DrawPixelInfo *dpi, Viewport *vp)
 {
 	/* The save rectangle */
 	const int l = vp->virtual_left;
@@ -1654,7 +1655,7 @@ void ViewportMapDrawVehicles(DrawPixelInfo *dpi, ViewPort *vp)
  * @param y  Y coordinate in the viewport.
  * @return Closest vehicle, or \c nullptr if none found.
  */
-Vehicle *CheckClickOnVehicle(const ViewPort *vp, int x, int y)
+Vehicle *CheckClickOnVehicle(const Viewport *vp, int x, int y)
 {
 	Vehicle *found = nullptr;
 	uint dist, best_dist = UINT_MAX;
@@ -3760,6 +3761,8 @@ char *Vehicle::DumpVehicleFlags(char *b, const char *last, bool include_tile) co
 	dump('l', HasBit(this->vcache.cached_veh_flags, VCF_LAST_VISUAL_EFFECT));
 	dump('z', HasBit(this->vcache.cached_veh_flags, VCF_GV_ZERO_SLOPE_RESIST));
 	dump('d', HasBit(this->vcache.cached_veh_flags, VCF_IS_DRAWN));
+	dump('t', HasBit(this->vcache.cached_veh_flags, VCF_REDRAW_ON_TRIGGER));
+	dump('s', HasBit(this->vcache.cached_veh_flags, VCF_REDRAW_ON_SPEED_CHANGE));
 	if (this->IsGroundVehicle()) {
 		uint16 gv_flags = this->GetGroundVehicleFlags();
 		b += seprintf(b, last, ", gvf:");

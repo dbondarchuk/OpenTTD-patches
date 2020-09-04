@@ -3813,6 +3813,9 @@ bool AfterLoadGame()
 
 	AfterLoadTraceRestrict();
 	AfterLoadTemplateVehiclesUpdateImage();
+	if (SlXvIsFeaturePresent(XSLFI_TEMPLATE_REPLACEMENT, 1, 5)) {
+		AfterLoadTemplateVehiclesUpdateProperties();
+	}
 
 	InvalidateVehicleTickCaches();
 	ClearVehicleTickCaches();
@@ -3905,4 +3908,5 @@ void ReloadNewGRFData()
 	MarkWholeScreenDirty();
 	CheckTrainsLengths();
 	AfterLoadTemplateVehiclesUpdateImage();
+	AfterLoadTemplateVehiclesUpdateProperties();
 }
